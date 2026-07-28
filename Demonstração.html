@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TechNova — Demonstração da Missão (Semana 15)</title>
+
+<!--
+  ==========================================================================
+  DEMONSTRAÇÃO "MISSÃO TECHNOVA" — arquivo único para mostrar em aula
+  --------------------------------------------------------------------------
+  Este arquivo reúne, em um projeto só, as três competências da semana:
+
+    1) LAYOUT       -> CSS Grid responsivo (procure "SPRINT 1" no CSS)
+    2) QUALIDADE    -> JavaScript moderno, comentado (procure "SPRINT 2" no bloco de script)
+    3) PERFORMANCE  -> loading="lazy" + comparação de minificação (procure "SPRINT 3")
+
+  Todas as imagens são SVGs embutidos (data URI), então o arquivo funciona
+  100% OFFLINE — sem depender de internet no laboratório de informática.
+  ==========================================================================
+-->
+
+<style>
+  /* ==================================================================
+     SPRINT 1 — FUNDAÇÃO: CSS GRID E LAYOUT RESPONSIVO
+     ================================================================== */
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0f172a;
+    --panel: #16212f;
+    --panel-2: #1e293b;
+    --accent: #f59e0b;
+    --accent-2: #38bdf8;
+    --good: #34d399;
+    --bad: #f87171;
+    --text: #f1f5f9;
+    --muted: #94a3b8;
+  }
+
+  body {
+    font-family: 'Segoe UI', Calibri, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.55;
+  }
+
+  /* --- o contêiner de grid: o "esqueleto" da página ------------------ */
+  .grid-container {
+    display: grid;
+    grid-template-columns: 220px 1fr;       /* menu fixo + conteúdo flexível (1fr) */
+    grid-template-rows: auto 1fr auto;      /* header e footer do tamanho do conteúdo */
+    grid-template-areas:
+      "header header"
+      "menu   main"
+      "footer footer";
+    min-height: 100vh;
+    gap: 14px;
+    padding: 14px;
+  }
+
+  .header   { grid-area: header; }
+  .menu     { grid-area: menu; }
+  .main     { grid-area: main; }
+  .footer   { grid-area: footer; }
+
+  /* --- header -------------------------------------------------------- */
+  .header {
+    background: linear-gradient(120deg, #1e293b 0%, #0f172a 100%);
+    border: 1px solid #27364a;
+    border-radius: 12px;
+    padding: 18px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .header .logo { font-size: 22px; font-weight: 800; color: var(--accent); }
+  .header .logo span { color: var(--text); }
+  .header .tagline { font-size: 13px; color: var(--muted); }
+
+  /* botão hambúrguer — só aparece em telas pequenas (ver media query) */
+  .hamburguer {
+    display: none;
+    background: var(--accent);
+    border: none;
+    color: #1f2937;
+    font-weight: 700;
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+
+  /* --- menu lateral ---------------------------------------------------*/
+  .menu {
+    background: var(--panel);
+    border: 1px solid #27364a;
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .menu h2 { font-size: 14px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 14px; }
+  .menu ul { list-style: none; }
+  .menu li { margin-bottom: 6px; }
+  .menu a {
+    display: block;
+    color: var(--text);
+    text-decoration: none;
+    padding: 9px 10px;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: background .2s ease, padding-left .2s ease;
+  }
+  .menu a:hover { background: #24344a; padding-left: 16px; }
+  .menu a.ativo { background: var(--accent); color: #1f2937; font-weight: 700; }
+
+  /* --- conteúdo principal --------------------------------------------*/
+  .main {
+    background: var(--panel);
+    border: 1px solid #27364a;
+    border-radius: 12px;
+    padding: 26px;
+  }
+
+  .hero { display: flex; gap: 22px; align-items: center; margin-bottom: 30px; }
+  .hero img {
+    width: 220px; height: 150px; object-fit: cover; border-radius: 10px;
+    border: 1px solid #27364a; flex-shrink: 0;
+  }
+  .hero h1 { font-size: 26px; margin-bottom: 8px; }
+  .hero p { color: var(--muted); font-size: 14px; max-width: 46ch; }
+
+  .section-title { font-size: 18px; margin: 6px 0 16px; color: var(--accent-2); }
+
+  /* galeria de cursos — também é um mini-grid, dentro do grid principal */
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+  }
+  .card {
+    background: var(--panel-2);
+    border: 1px solid #2c3e50;
+    border-radius: 10px;
+    overflow: hidden;
+    transition: transform .2s ease, box-shadow .2s ease;
+  }
+  .card:hover { transform: translateY(-4px); box-shadow: 0 10px 24px rgba(0,0,0,.35); }
+  .card img { width: 100%; height: 120px; object-fit: cover; display: block; background: #0b1220; }
+  .card .body { padding: 12px 14px; }
+  .card h3 { font-size: 15px; margin-bottom: 4px; }
+  .card p { font-size: 12.5px; color: var(--muted); margin-bottom: 8px; }
+  .status {
+    display: inline-block; font-size: 11px; padding: 3px 8px; border-radius: 20px;
+    background: #2c3e50; color: var(--muted);
+  }
+  .status.loaded { background: rgba(52,211,153,.15); color: var(--good); }
+
+  /* --- footer ---------------------------------------------------------*/
+  .footer {
+    background: var(--panel);
+    border: 1px solid #27364a;
+    border-radius: 12px;
+    padding: 16px 24px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  /* --- painel do professor (SPRINT 3: minificação) --------------------*/
+  .painel-professor {
+    grid-column: 1 / -1;
+    background: var(--panel-2);
+    border: 1px dashed var(--accent);
+    border-radius: 12px;
+    padding: 4px 20px 18px;
+  }
+  .painel-professor summary {
+    cursor: pointer; padding: 14px 0; font-weight: 700; color: var(--accent); font-size: 14px;
+  }
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .compare pre {
+    background: #0b1220; border: 1px solid #27364a; border-radius: 8px; padding: 12px;
+    font-family: 'Courier New', monospace; font-size: 12px; overflow-x: auto; color: #e2e8f0;
+  }
+  .compare .tag { font-size: 12px; font-weight: 700; margin-bottom: 6px; display: block; }
+  .tag.bad { color: var(--bad); } .tag.good { color: var(--good); }
+
+  /* ==================================================================
+     RESPONSIVIDADE — mesma ideia ensinada na Aula 1, aplicada aqui
+     ================================================================== */
+  @media (max-width: 768px) {
+    .grid-container {
+      grid-template-columns: 1fr;             /* menu deixa de ter coluna própria */
+      grid-template-areas:
+        "header"
+        "main"
+        "footer";
+    }
+    .hamburguer { display: inline-block; }    /* mostra o botão só no mobile */
+    .menu {
+      display: none;                          /* escondido por padrão no mobile... */
+      grid-area: header;                      /* ...e quando aberto, "flutua" logo abaixo do header */
+      margin-top: 74px;
+      position: relative;
+      z-index: 5;
+    }
+    .menu.aberto { display: block; }          /* classe alternada pelo JS (SPRINT 2) */
+    .hero { flex-direction: column; align-items: flex-start; }
+    .hero img { width: 100%; height: 160px; }
+    .compare { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="grid-container">
+
+    <!-- HEADER — grid-area: header ---------------------------------- -->
+    <header class="header">
+      <div>
+        <div class="logo">Tech<span>Nova</span></div>
+        <div class="tagline">cursos on-line para quem quer migrar de carreira</div>
+      </div>
+      <button class="hamburguer" id="btnMenu" aria-expanded="false" aria-controls="menuLateral">☰ Menu</button>
+    </header>
+
+    <!-- MENU — grid-area: menu ---------------------------------------- -->
+    <nav class="menu" id="menuLateral">
+      <h2>Navegação</h2>
+      <ul>
+        <li><a href="#" class="ativo">🏠 Início</a></li>
+        <li><a href="#cursos">🎓 Cursos</a></li>
+        <li><a href="#">💬 Depoimentos</a></li>
+        <li><a href="#">✉️ Contato</a></li>
+      </ul>
+    </nav>
+
+    <!-- MAIN — grid-area: main ----------------------------------------- -->
+    <main class="main">
+
+      <section class="hero">
+        <!--
+          Esta é a imagem "acima da dobra" (a primeira coisa que a pessoa vê).
+          Repare que ELA NÃO TEM loading="lazy" — de propósito! Ela deve
+          aparecer o mais rápido possível, porque é o que mais pesa no LCP.
+        -->
+        <img
+          src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23f59e0b'/%3E%3Cstop offset='1' stop-color='%23fbbf24'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='400' height='300' fill='url(%23g)'/%3E%3Ctext x='50%25' y='52%25' font-size='26' font-family='Arial' fill='%231f2937' text-anchor='middle' font-weight='bold'%3E🚀 TechNova%3C/text%3E%3C/svg%3E"
+          alt="Banner de boas-vindas da TechNova">
+        <div>
+          <h1>Aprenda a programar do zero</h1>
+          <p>Cursos práticos de desenvolvimento web, com projetos reais — como este site, que a nossa própria turma de estagiários está otimizando.</p>
+        </div>
+      </section>
+
+      <h2 class="section-title" id="cursos">🎓 Cursos em destaque</h2>
+
+      <!-- Galeria — todas estas imagens usam loading="lazy" de propósito:
+           elas estão "abaixo da dobra", então podem esperar o usuário rolar
+           até perto delas antes de baixar. -->
+      <div class="gallery">
+        <article class="card">
+          <img loading="lazy" onload="marcarCarregada(this)"
+            src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='180'%3E%3Crect width='300' height='180' fill='%2338bdf8'/%3E%3Ctext x='50%25' y='55%25' font-size='20' font-family='Arial' fill='%230f172a' text-anchor='middle' font-weight='bold'%3EHTML %26 CSS%3C/text%3E%3C/svg%3E"
+            alt="Curso de HTML e CSS">
+          <div class="body">
+            <h3>HTML &amp; CSS na prática</h3>
+            <p>Construa layouts responsivos com CSS Grid, do zero.</p>
+            <span class="status" data-status>⏳ carregando…</span>
+          </div>
+        </article>
+
+        <article class="card">
+          <img loading="lazy" onload="marcarCarregada(this)"
+            src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='180'%3E%3Crect width='300' height='180' fill='%23f59e0b'/%3E%3Ctext x='50%25' y='55%25' font-size='20' font-family='Arial' fill='%231f2937' text-anchor='middle' font-weight='bold'%3EJavaScript%3C/text%3E%3C/svg%3E"
+            alt="Curso de JavaScript moderno">
+          <div class="body">
+            <h3>JavaScript moderno</h3>
+            <p>Arrow functions, destructuring e o essencial do ES6+.</p>
+            <span class="status" data-status>⏳ carregando…</span>
+          </div>
+        </article>
+
+        <article class="card">
+          <img loading="lazy" onload="marcarCarregada(this)"
+            src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='180'%3E%3Crect width='300' height='180' fill='%2334d399'/%3E%3Ctext x='50%25' y='55%25' font-size='20' font-family='Arial' fill='%230f172a' text-anchor='middle' font-weight='bold'%3EBanco de Dados%3C/text%3E%3C/svg%3E"
+            alt="Curso de Banco de Dados">
+          <div class="body">
+            <h3>Banco de Dados com MySQL</h3>
+            <p>Modelagem, consultas e recuperação de dados.</p>
+            <span class="status" data-status>⏳ carregando…</span>
+          </div>
+        </article>
+
+        <article class="card">
+          <img loading="lazy" onload="marcarCarregada(this)"
+            src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='180'%3E%3Crect width='300' height='180' fill='%23f87171'/%3E%3Ctext x='50%25' y='55%25' font-size='20' font-family='Arial' fill='%231f2937' text-anchor='middle' font-weight='bold'%3EFerramentas Dev%3C/text%3E%3C/svg%3E"
+            alt="Curso de ferramentas de desenvolvimento">
+          <div class="body">
+            <h3>Prettier, ESLint &amp; Babel</h3>
+            <p>Configure um projeto profissional do zero.</p>
+            <span class="status" data-status>⏳ carregando…</span>
+          </div>
+        </article>
+
+        <article class="card">
+          <img loading="lazy" onload="marcarCarregada(this)"
+            src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='180'%3E%3Crect width='300' height='180' fill='%23a78bfa'/%3E%3Ctext x='50%25' y='55%25' font-size='20' font-family='Arial' fill='%230f172a' text-anchor='middle' font-weight='bold'%3EUX %2F UI%3C/text%3E%3C/svg%3E"
+            alt="Curso de UX e UI">
+          <div class="body">
+            <h3>Fundamentos de UX/UI</h3>
+            <p>Princípios de design para telas responsivas.</p>
+            <span class="status" data-status>⏳ carregando…</span>
+          </div>
+        </article>
+
+        <article class="card">
+          <img loading="lazy" onload="marcarCarregada(this)"
+            src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='180'%3E%3Crect width='300' height='180' fill='%23fb923c'/%3E%3Ctext x='50%25' y='55%25' font-size='20' font-family='Arial' fill='%231f2937' text-anchor='middle' font-weight='bold'%3EPerformance%3C/text%3E%3C/svg%3E"
+            alt="Curso de performance web">
+          <div class="body">
+            <h3>Performance Web</h3>
+            <p>Lazy loading, minificação e Core Web Vitals.</p>
+            <span class="status" data-status>⏳ carregando…</span>
+          </div>
+        </article>
+      </div>
+
+      <!-- ============================================================
+           SPRINT 3 — PAINEL DO PROFESSOR: minificação, sem precisar
+           instalar Node/PostCSS. Clique para abrir em aula.
+           ============================================================ -->
+      <details class="painel-professor" style="margin-top:26px;">
+        <summary>🧪 Painel do professor — CSS original vs. minificado (clique para abrir)</summary>
+        <div class="compare">
+          <div>
+            <span class="tag bad">ANTES — estilos.css (fácil de ler, ~250 bytes)</span>
+            <pre>.card {
+	background: #1e293b;
+	border-radius: 10px;
+	padding: 14px;
+}
+
+.card h3 {
+  font-size: 15px;
+  margin-bottom: 4px;
+}</pre>
+          </div>
+          <div>
+            <span class="tag good">DEPOIS — estilos.min.css (~130 bytes, ≈48% menor)</span>
+            <pre>.card{
+	background:#1e293b;
+	border-radius:10px;
+	padding:14px
+}
+
+.card h3{
+	font-size:15px;
+	margin-bottom:4px
+}</pre>
+          </div>
+        </div>
+        <p style="margin-top:12px; font-size:12.5px; color:var(--muted);">
+          Gerado com: <code style="color:var(--accent-2)">npx postcss estilos.css -o estilos.min.css</code>
+          (usando PostCSS + cssnano). O navegador entende as duas versões perfeitamente —
+          a diferença é só o tamanho do download.
+        </p>
+      </details>
+
+    </main>
+
+    <!-- FOOTER — grid-area: footer -------------------------------------->
+    <footer class="footer">
+      TechNova © 2026 — site otimizado pela turma de Desenvolvimento de Sistemas · Missão Semana 15
+    </footer>
+
+  </div>
+
+<script>
+  /* ====================================================================
+     SPRINT 2 — QUALIDADE: JavaScript moderno, o mesmo que discutimos
+     com Prettier + ESLint + Babel (aqui já formatado e "lintado").
+     ==================================================================== */
+
+  // Arrow function + template literal (em vez de function()/concatenação)
+  const saudacao = (nome) => `👋 Olá, ${nome}! O site da TechNova está no ar.`;
+  console.log(saudacao('turma'));
+
+  // Destructuring: extrai propriedades de um objeto de forma direta
+  const missao = { sprint: 3, foco: 'performance', concluida: false };
+  const { sprint, foco } = missao;
+  console.log(`Sprint atual: ${sprint} — foco em ${foco}`);
+
+  // -------------------- menu-hambúrguer (desafio bônus da Aula 1) -------
+  // Em vez de só "esconder" o menu como no exemplo básico, aqui ele
+  // alterna (toggle) — é o desafio bônus já resolvido, para referência.
+  const botaoMenu = document.getElementById('btnMenu');
+  const menuLateral = document.getElementById('menuLateral');
+
+  botaoMenu.addEventListener('click', () => {
+    const aberto = menuLateral.classList.toggle('aberto');
+    botaoMenu.setAttribute('aria-expanded', aberto);
+    botaoMenu.textContent = aberto ? '✕ Fechar' : '☰ Menu';
+  });
+
+  // -------------------- feedback visual do Lazy Loading (SPRINT 3) ------
+  // Chamada pelo onload="" de cada <img loading="lazy"> da galeria.
+  function marcarCarregada(imgElemento) {
+    const card = imgElemento.closest('.card');
+    const status = card.querySelector('[data-status]');
+    status.textContent = '✅ carregada';
+    status.classList.add('loaded');
+    console.log('🖼️ Imagem carregada sob demanda (lazy loading).');
+  }
+
+  // -------------------- métricas de performance no console --------------
+  window.addEventListener('load', () => {
+    const nav = performance.getEntriesByType('navigation')[0];
+    console.log('%c⚡ Métricas desta página', 'color:#38bdf8;font-weight:bold;font-size:14px;');
+    if (nav) {
+      console.log(`DOMContentLoaded: ${Math.round(nav.domContentLoadedEventEnd)}ms`);
+      console.log(`Load completo: ${Math.round(nav.loadEventEnd)}ms`);
+    }
+    console.log('Abra a aba Network do DevTools e role a página para ver as imagens da galeria carregando sob demanda.');
+  });
+</script>
+</body>
+</html>
