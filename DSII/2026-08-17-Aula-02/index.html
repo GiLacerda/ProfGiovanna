@@ -1,324 +1,512 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reutilização de Código e Refatoração</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reutilização de Código e Refatoração</title>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
+    html {
+        overflow-x: hidden;
+    }
 
-        .container {
-            max-width: 1100px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-            overflow: hidden;
-        }
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px;
+        overflow-x: hidden;
+    }
 
-        header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 40px 20px;
-            text-align: center;
+    .container {
+        max-width: 1100px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        overflow: hidden;
+    }
+
+    header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 40px 20px 30px;
+        text-align: center;
+    }
+
+    header h1 {
+        font-size: 2.3em;
+        margin-bottom: 10px;
+        word-wrap: break-word;
+    }
+
+    header p {
+        font-size: 1.1em;
+        opacity: 0.9;
+    }
+
+    /* ===== TABS ===== */
+    .tabs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        background: #eef0fb;
+        padding: 10px 10px 0;
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        border-bottom: 3px solid #667eea;
+    }
+
+    .tab-btn {
+        appearance: none;
+        border: none;
+        background: #dde1f5;
+        color: #4a4a6a;
+        font-size: 0.95em;
+        font-weight: 600;
+        padding: 12px 16px;
+        border-radius: 8px 8px 0 0;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+        transition: background 0.2s, color 0.2s, transform 0.15s;
+    }
+
+    .tab-btn:hover {
+        background: #c7cdf2;
+    }
+
+    .tab-btn.active {
+        background: white;
+        color: #667eea;
+        box-shadow: 0 -2px 8px rgba(0,0,0,0.08);
+    }
+
+    .tab-btn:focus-visible {
+        outline: 3px solid #ffc107;
+        outline-offset: -3px;
+    }
+
+    main {
+        padding: 40px;
+        max-width: 100%;
+    }
+
+    .tab-panel {
+        display: none;
+        animation: fadeIn 0.25s ease;
+    }
+
+    .tab-panel.active {
+        display: block;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(6px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    section {
+        margin-bottom: 40px;
+        padding: 30px;
+        background: #f8f9fa;
+        border-left: 5px solid #667eea;
+        border-radius: 5px;
+        max-width: 100%;
+    }
+
+    section:last-child {
+        margin-bottom: 0;
+    }
+
+    section h2 {
+        color: #667eea;
+        font-size: 1.7em;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .icon {
+        font-size: 1.5em;
+    }
+
+    section h3 {
+        color: #764ba2;
+        font-size: 1.25em;
+        margin-top: 25px;
+        margin-bottom: 12px;
+    }
+
+    section h4 {
+        color: #555;
+        font-size: 1.05em;
+        margin-top: 20px;
+        margin-bottom: 10px;
+    }
+
+    p {
+        margin-bottom: 12px;
+        max-width: 100%;
+        overflow-wrap: break-word;
+    }
+
+    .exemplo {
+        background: white;
+        border: 2px solid #e0e0e0;
+        border-radius: 5px;
+        margin: 20px 0;
+        overflow: hidden;
+        max-width: 100%;
+    }
+
+    .exemplo-titulo {
+        background: #e8eaf6;
+        padding: 15px;
+        font-weight: bold;
+        color: #667eea;
+        border-bottom: 2px solid #667eea;
+    }
+
+    .codigo {
+        background: #2d2d2d;
+        color: #f8f8f2;
+        padding: 20px;
+        overflow-x: auto;
+        font-family: 'Courier New', monospace;
+        font-size: 0.85em;
+        line-height: 1.5;
+        white-space: pre;
+        max-width: 100%;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .resultado {
+        padding: 20px;
+        background: white;
+        border-top: 1px solid #e0e0e0;
+    }
+
+    .comentario {
+        color: #6a737d;
+        font-style: italic;
+    }
+
+    .destaque {
+        background: #fff3cd;
+        padding: 15px;
+        border-left: 4px solid #ffc107;
+        margin: 15px 0;
+        border-radius: 3px;
+        overflow-wrap: break-word;
+    }
+
+    .bom {
+        background: #d4edda;
+        border-left: 4px solid #28a745;
+        padding: 15px;
+        margin: 15px 0;
+        border-radius: 3px;
+        overflow-wrap: break-word;
+    }
+
+    .ruim {
+        background: #f8d7da;
+        border-left: 4px solid #dc3545;
+        padding: 15px;
+        margin: 15px 0;
+        border-radius: 3px;
+        overflow-wrap: break-word;
+    }
+
+    .lista-pontos {
+        list-style: none;
+        padding: 0;
+    }
+
+    .lista-pontos li {
+        padding: 10px 0;
+        padding-left: 30px;
+        position: relative;
+        overflow-wrap: break-word;
+    }
+
+    .lista-pontos li:before {
+        content: "✓";
+        position: absolute;
+        left: 0;
+        color: #28a745;
+        font-weight: bold;
+        font-size: 1.2em;
+    }
+
+    .table-wrap {
+        width: 100%;
+        overflow-x: auto;
+        margin: 20px 0;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    table {
+        width: 100%;
+        min-width: 480px;
+        border-collapse: collapse;
+    }
+
+    th, td {
+        border: 1px solid #ddd;
+        padding: 12px;
+        text-align: left;
+        vertical-align: top;
+    }
+
+    th {
+        background: #667eea;
+        color: white;
+    }
+
+    tr:nth-child(even) {
+        background: #f9f9f9;
+    }
+
+    .comparacao {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin: 20px 0;
+    }
+
+    .comparacao > div {
+        padding: 15px;
+        border-radius: 5px;
+        min-width: 0;
+    }
+
+    .comparacao-bom {
+        background: #d4edda;
+        border-left: 4px solid #28a745;
+    }
+
+    .comparacao-ruim {
+        background: #f8d7da;
+        border-left: 4px solid #dc3545;
+    }
+
+    .comparacao h4 {
+        margin-bottom: 10px;
+        font-weight: bold;
+    }
+
+    .comparacao .codigo {
+        margin: 0 -15px -15px;
+        border-radius: 0 0 5px 5px;
+    }
+
+    .principios {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin: 20px 0;
+    }
+
+    .principio-card {
+        background: white;
+        padding: 20px;
+        border-radius: 5px;
+        border: 2px solid #667eea;
+        min-width: 0;
+    }
+
+    .principio-card h4 {
+        color: #667eea;
+        margin-bottom: 10px;
+        margin-top: 0;
+    }
+
+    footer {
+        background: #f8f9fa;
+        padding: 20px;
+        text-align: center;
+        color: #666;
+        border-top: 1px solid #ddd;
+    }
+
+    .tip {
+        background: #e3f2fd;
+        border-left: 4px solid #2196f3;
+        padding: 15px;
+        margin: 15px 0;
+        border-radius: 3px;
+        overflow-wrap: break-word;
+    }
+
+    .resumo-box {
+        background: #f0f4ff;
+        padding: 20px;
+        border-radius: 5px;
+        margin: 20px 0;
+    }
+
+    .resumo-box li {
+        margin: 10px 0;
+        margin-left: 20px;
+    }
+
+    .lang-badge {
+        display: inline-block;
+        background: #667eea;
+        color: white;
+        font-size: 0.75em;
+        font-weight: bold;
+        padding: 3px 9px;
+        border-radius: 12px;
+        margin-right: 6px;
+        white-space: nowrap;
+    }
+
+    code {
+        background: #eef0fb;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-family: 'Courier New', monospace;
+        word-break: break-word;
+    }
+
+    .intro-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin: 20px 0;
+    }
+
+    .intro-grid > div {
+        min-width: 0;
+    }
+
+    @media (max-width: 768px) {
+        .comparacao, .principios, .intro-grid {
+            grid-template-columns: 1fr;
         }
 
         header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-        }
-
-        header p {
-            font-size: 1.1em;
-            opacity: 0.9;
+            font-size: 1.6em;
         }
 
         main {
-            padding: 40px;
+            padding: 20px 16px;
         }
 
         section {
-            margin-bottom: 40px;
-            padding: 30px;
-            background: #f8f9fa;
-            border-left: 5px solid #667eea;
-            border-radius: 5px;
+            padding: 18px;
         }
 
-        section h2 {
-            color: #667eea;
-            font-size: 1.8em;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+        .tab-btn {
+            font-size: 0.85em;
+            padding: 10px 12px;
         }
-
-        .icon {
-            font-size: 1.5em;
-        }
-
-        section h3 {
-            color: #764ba2;
-            font-size: 1.3em;
-            margin-top: 25px;
-            margin-bottom: 15px;
-        }
-
-        section h4 {
-            color: #555;
-            font-size: 1.1em;
-            margin-top: 20px;
-            margin-bottom: 10px;
-        }
-
-        .exemplo {
-            background: white;
-            border: 2px solid #e0e0e0;
-            border-radius: 5px;
-            margin: 20px 0;
-            overflow: hidden;
-        }
-
-        .exemplo-titulo {
-            background: #e8eaf6;
-            padding: 15px;
-            font-weight: bold;
-            color: #667eea;
-            border-bottom: 2px solid #667eea;
-        }
-
-        .codigo {
-            background: #2d2d2d;
-            color: #f8f8f2;
-            padding: 20px;
-            overflow-x: auto;
-            font-family: 'Courier New', monospace;
-            font-size: 0.9em;
-            line-height: 1.5;
-            white-space: pre;
-        }
-
-        .resultado {
-            padding: 20px;
-            background: white;
-            border-top: 1px solid #e0e0e0;
-        }
-
-        .comentario {
-            color: #6a737d;
-            font-style: italic;
-        }
-
-        .destaque {
-            background: #fff3cd;
-            padding: 15px;
-            border-left: 4px solid #ffc107;
-            margin: 15px 0;
-            border-radius: 3px;
-        }
-
-        .bom {
-            background: #d4edda;
-            border-left: 4px solid #28a745;
-            padding: 15px;
-            margin: 15px 0;
-            border-radius: 3px;
-        }
-
-        .ruim {
-            background: #f8d7da;
-            border-left: 4px solid #dc3545;
-            padding: 15px;
-            margin: 15px 0;
-            border-radius: 3px;
-        }
-
-        .lista-pontos {
-            list-style: none;
-            padding: 0;
-        }
-
-        .lista-pontos li {
-            padding: 10px 0;
-            padding-left: 30px;
-            position: relative;
-        }
-
-        .lista-pontos li:before {
-            content: "✓";
-            position: absolute;
-            left: 0;
-            color: #28a745;
-            font-weight: bold;
-            font-size: 1.2em;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-        }
-
-        th, td {
-            border: 1px solid #ddd;
-            padding: 12px;
-            text-align: left;
-        }
-
-        th {
-            background: #667eea;
-            color: white;
-        }
-
-        tr:nth-child(even) {
-            background: #f9f9f9;
-        }
-
-        .comparacao {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin: 20px 0;
-        }
-
-        .comparacao > div {
-            padding: 15px;
-            border-radius: 5px;
-        }
-
-        .comparacao-bom {
-            background: #d4edda;
-            border-left: 4px solid #28a745;
-        }
-
-        .comparacao-ruim {
-            background: #f8d7da;
-            border-left: 4px solid #dc3545;
-        }
-
-        .comparacao h4 {
-            margin-bottom: 10px;
-            font-weight: bold;
-        }
-
-        .princípios {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin: 20px 0;
-        }
-
-        .princípio-card {
-            background: white;
-            padding: 20px;
-            border-radius: 5px;
-            border: 2px solid #667eea;
-        }
-
-        .princípio-card h4 {
-            color: #667eea;
-            margin-bottom: 10px;
-        }
-
-        footer {
-            background: #f8f9fa;
-            padding: 20px;
-            text-align: center;
-            color: #666;
-            border-top: 1px solid #ddd;
-        }
-
-        .tip {
-            background: #e3f2fd;
-            border-left: 4px solid #2196f3;
-            padding: 15px;
-            margin: 15px 0;
-            border-radius: 3px;
-        }
-
-        .resumo-box {
-            background: #f0f4ff;
-            padding: 20px;
-            border-radius: 5px;
-            margin: 20px 0;
-        }
-
-        .resumo-box li {
-            margin: 10px 0;
-            margin-left: 20px;
-        }
-
-        @media (max-width: 768px) {
-            .comparacao, .princípios {
-                grid-template-columns: 1fr;
-            }
-
-            header h1 {
-                font-size: 1.8em;
-            }
-
-            main {
-                padding: 20px;
-            }
-
-            section {
-                padding: 20px;
-            }
-        }
-    </style>
+    }
+</style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>🎓 Reutilização de Código e Refatoração</h1>
-            <p>Escreva menos, aproveite mais, melhore sempre</p>
-        </header>
+<div class="container">
+    <header>
+        <h1>🎓 Reutilização de Código e Refatoração</h1>
+        <p>Escreva menos, aproveite mais, melhore sempre</p>
+    </header>
 
-        <main>
-            <!-- INTRODUÇÃO -->
+    <nav class="tabs" role="tablist" aria-label="Seções do conteúdo">
+        <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="tab-intro" data-tab="tab-intro">🚀 Introdução</button>
+        <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-reuse" data-tab="tab-reuse">♻️ Reutilização</button>
+        <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-refactor" data-tab="tab-refactor">🔧 Refatoração</button>
+        <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-example" data-tab="tab-example">📚 Exemplo Completo</button>
+        <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-tools" data-tab="tab-tools">🛠️ Ferramentas</button>
+        <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-checklist" data-tab="tab-checklist">✅ Checklist</button>
+        <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-reference" data-tab="tab-reference">📋 Referência Rápida</button>
+    </nav>
+
+    <main>
+
+        <!-- ===================== TAB: INTRODUÇÃO ===================== -->
+        <div class="tab-panel active" id="tab-intro" role="tabpanel">
             <section>
                 <h2><span class="icon">🚀</span> Por Que Esses Conceitos Importam?</h2>
 
-                <p>Reutilizar código e refatorar são duas faces da mesma moeda: evitar retrabalho e manter o código saudável ao longo do tempo.</p>
+                <p>Todo sistema de software cresce com o tempo: novas telas, novas regras de negócio, novas integrações. Se cada nova necessidade for resolvida copiando e colando código existente, o projeto acumula uma dívida silenciosa — a <strong>dívida técnica</strong> — que só aparece quando já é cara demais para pagar.</p>
+
+                <p><strong>Reutilização de código</strong> e <strong>refatoração</strong> são as duas ferramentas mais básicas para conter essa dívida. Reutilização evita que a mesma lógica seja escrita duas vezes; refatoração garante que o código, depois de escrito, continue saudável mesmo enquanto o sistema muda ao seu redor. Elas resolvem problemas em momentos diferentes: reutilização atua <em>enquanto você escreve</em> código novo, refatoração atua <em>depois</em>, cuidando do que já existe.</p>
+
+                <div class="intro-grid">
+                    <div class="exemplo">
+                        <div class="exemplo-titulo">Sem esses cuidados</div>
+                        <div class="resultado">
+                            <ul class="lista-pontos">
+                                <li>A mesma regra de negócio existe em 5 lugares diferentes</li>
+                                <li>Corrigir um bug exige lembrar de todos os lugares e corrigir em cada um</li>
+                                <li>Métodos gigantes que ninguém quer mexer com medo de quebrar algo</li>
+                                <li>Toda mudança pequena demora horas por causa do medo e da confusão</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="exemplo">
+                        <div class="exemplo-titulo">Com esses cuidados</div>
+                        <div class="resultado">
+                            <ul class="lista-pontos">
+                                <li>Cada regra de negócio vive em um único lugar</li>
+                                <li>Corrigir um bug corrige o comportamento em todo o sistema de uma vez</li>
+                                <li>Métodos pequenos, com nomes claros e fáceis de testar</li>
+                                <li>Novas funcionalidades aproveitam o que já existe em vez de recomeçar do zero</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <h3>O que você vai encontrar nas próximas abas</h3>
+                <p>Este material está organizado em abas — use os botões no topo da página para navegar entre elas. Cada aba cobre uma parte do assunto:</p>
                 <ul class="lista-pontos">
-                    <li>Reduzir código duplicado e o risco de bugs inconsistentes</li>
-                    <li>Acelerar o desenvolvimento de novas funcionalidades</li>
-                    <li>Manter o sistema fácil de entender e modificar</li>
-                    <li>Diminuir o custo de manutenção a longo prazo</li>
-                    <li>Preparar o código para crescer sem quebrar</li>
+                    <li><strong>Reutilização</strong> — técnicas para evitar duplicação: métodos, herança, interfaces, composição e generics.</li>
+                    <li><strong>Refatoração</strong> — como identificar código problemático ("code smells") e técnicas passo a passo para melhorá-lo sem quebrar nada.</li>
+                    <li><strong>Exemplo Completo</strong> — um caso prático, do código ruim ao código refatorado, com a justificativa de cada mudança.</li>
+                    <li><strong>Ferramentas</strong> — o ferramental de apoio, em Java e em outras linguagens populares.</li>
+                    <li><strong>Checklist</strong> — uma lista de verificação para revisar código antes de considerá-lo pronto.</li>
+                    <li><strong>Referência Rápida</strong> — um resumo visual dos principais conceitos.</li>
                 </ul>
 
                 <div class="destaque">
-                    <strong>💡 Lembre-se:</strong> Reutilização evita que você escreva a mesma lógica duas vezes. Refatoração garante que o código continue bom depois que ele já existe.
+                    <strong>💡 Lembre-se:</strong> reutilização evita que você escreva a mesma lógica duas vezes. Refatoração garante que o código continue bom depois que ele já existe. São práticas complementares, não alternativas — times maduros aplicam as duas o tempo todo.
                 </div>
+
+                <h3>O custo real de ignorar esses conceitos</h3>
+                <p>Estudos e experiências de mercado mostram que a maior parte do custo de um software não está em escrevê-lo pela primeira vez, e sim em mantê-lo ao longo dos anos: corrigir bugs, adicionar funcionalidades, adaptar a regras de negócio novas. Código duplicado e mal estruturado multiplica esse custo, porque cada mudança precisa ser replicada manualmente e cada parte mal organizada aumenta a chance de erro humano. Investir tempo em reutilização e refatoração hoje é, na prática, reduzir o custo de todas as mudanças futuras.</p>
             </section>
+        </div>
 
-            <!-- 1. REUTILIZAÇÃO DE CÓDIGO -->
+        <!-- ===================== TAB: REUTILIZAÇÃO ===================== -->
+        <div class="tab-panel" id="tab-reuse" role="tabpanel">
             <section>
-                <h2><span class="icon">♻️</span> 1. Reutilização de Código</h2>
+                <h2><span class="icon">♻️</span> Reutilização de Código</h2>
 
-                <p>Reutilização é a prática de usar um mesmo trecho de lógica em diferentes partes do sistema, em vez de reescrevê-lo repetidamente.</p>
+                <p>Reutilização é a prática de usar um mesmo trecho de lógica em diferentes partes do sistema, em vez de reescrevê-lo repetidamente. Isso pode acontecer em escalas bem diferentes: reaproveitar algumas linhas dentro da mesma classe, compartilhar comportamento entre classes relacionadas, ou até reaproveitar bibliotecas inteiras escritas por outras pessoas.</p>
 
                 <h3>Princípio DRY</h3>
                 <div class="destaque">
                     <strong>💡 DRY — Don't Repeat Yourself:</strong> toda regra de negócio deve existir em um único lugar no código. Se você precisa mudar algo em dois lugares diferentes para corrigir um único problema, há duplicação a resolver.
                 </div>
+                <p>Vale notar que DRY fala sobre <strong>duplicação de conhecimento</strong>, não apenas de texto. Dois trechos de código podem parecer parecidos sem violar DRY (coincidência), assim como dois trechos visualmente diferentes podem estar duplicando a mesma regra de negócio de formas diferentes. A pergunta certa é sempre: "se essa regra mudar, quantos lugares eu preciso tocar?". Se a resposta for mais que um, há duplicação de conhecimento a resolver.</p>
 
                 <h3>1.1 Extraindo Lógica Repetida em Métodos</h3>
+                <p>A forma mais simples de reutilizar código é extrair um trecho repetido para um método com nome claro, e chamar esse método de todos os lugares que precisam da mesma lógica.</p>
 
                 <div class="comparacao">
                     <div class="comparacao-ruim">
@@ -344,8 +532,10 @@ public double calcularVolumeCilindro(double raio, double altura) {
 }</div>
                     </div>
                 </div>
+                <p>Repare que, além de eliminar a duplicação, a versão reutilizada corrigiu um problema escondido: o valor aproximado <code>3.14159</code> poderia divergir do valor usado em outro lugar do sistema. Ao centralizar o cálculo em <code>calcularAreaCirculo</code>, que usa a constante <code>Math.PI</code>, garantimos que todo o sistema use exatamente o mesmo valor.</p>
 
                 <h3>1.2 Reutilização com Herança</h3>
+                <p>Herança permite que uma classe (subclasse) reaproveite atributos e métodos definidos em outra classe (superclasse). É útil quando existe uma relação natural de <strong>"é um"</strong> entre as classes — por exemplo, um Gerente <em>é um</em> Funcionário, com algumas particularidades a mais.</p>
 
                 <div class="exemplo">
                     <div class="exemplo-titulo">Compartilhando atributos e comportamentos comuns</div>
@@ -379,8 +569,14 @@ public class Gerente extends Funcionario {
     }
 }</div>
                 </div>
+                <p>Aqui, <code>Gerente</code> reaproveita todos os atributos e o construtor de <code>Funcionario</code>, e apenas sobrescreve (<code>@Override</code>) o comportamento que precisa ser diferente. Isso evita duplicar os campos <code>nome</code> e <code>salarioBase</code>, e a lógica que os inicializa.</p>
+
+                <div class="tip">
+                    <strong>💡 Cuidado:</strong> herança cria um acoplamento forte entre as classes — mudanças na superclasse afetam todas as subclasses, às vezes de formas inesperadas. Esse efeito colateral é conhecido como <em>fragile base class problem</em> (problema da classe-base frágil). Use herança apenas quando a relação "é um" for genuinamente verdadeira.
+                </div>
 
                 <h3>1.3 Reutilização com Interfaces</h3>
+                <p>Quando classes não têm parentesco natural, mas precisam ser tratadas de forma parecida por outra parte do sistema, interfaces permitem definir um contrato comum sem forçar uma hierarquia de herança.</p>
 
                 <div class="exemplo">
                     <div class="exemplo-titulo">Contrato comum entre classes sem parentesco</div>
@@ -414,17 +610,17 @@ public double calcularTotalAPagar(List<Pagavel> itens) {
     return total;
 }</div>
                 </div>
+                <p><code>Funcionario</code> e <code>Fornecedor</code> não compartilham uma superclasse comum além de <code>Object</code>, mas o método <code>calcularTotalAPagar</code> consegue reutilizar a mesma lógica de soma para os dois, porque ambos cumprem o contrato <code>Pagavel</code>. Esse é um exemplo de <strong>polimorfismo</strong>: o mesmo código funciona para tipos diferentes.</p>
 
                 <h3>1.4 Herança vs. Composição</h3>
-
-                <p>Herança representa uma relação <strong>"é um"</strong>. Quando essa relação não é natural, composição — uma relação <strong>"tem um"</strong> — costuma ser a escolha mais flexível.</p>
+                <p>Herança representa uma relação <strong>"é um"</strong>. Quando essa relação não é natural, composição — uma relação <strong>"tem um"</strong> — costuma ser a escolha mais flexível, porque permite trocar o comportamento em tempo de execução, sem herdar coisas que não fazem sentido.</p>
 
                 <div class="comparacao">
                     <div class="comparacao-ruim">
                         <h4>❌ Herança Forçada</h4>
                         <div class="codigo">// Um carro elétrico "é um" carro, ok.
 public class Carro {
-    public void ligarMotorCombustao() { ... }
+    public void ligarMotorCombustao() { }
 }
 
 // Mas carro elétrico não tem motor a combustão!
@@ -440,7 +636,9 @@ public class CarroEletrico extends Carro {
 }
 
 public class MotorEletrico implements Motor {
-    public void ligar() { /* liga o motor elétrico */ }
+    public void ligar() {
+        // liga o motor eletrico
+    }
 }
 
 public class Carro {
@@ -456,9 +654,64 @@ public class Carro {
 }</div>
                     </div>
                 </div>
+                <p>Na versão com composição, <code>Carro</code> não precisa saber se o motor é elétrico, a combustão ou híbrido — ele apenas depende da interface <code>Motor</code>. Isso torna o sistema mais fácil de estender: um novo tipo de motor pode ser criado sem tocar na classe <code>Carro</code>.</p>
 
-                <h3>1.5 Formas de Reutilização</h3>
+                <h3>1.5 Reutilização com Generics</h3>
+                <p>Em Java, <strong>generics</strong> (tipos genéricos) permitem escrever uma única classe ou método que funciona com diferentes tipos de dados, evitando duplicar a mesma estrutura para cada tipo.</p>
 
+                <div class="comparacao">
+                    <div class="comparacao-ruim">
+                        <h4>❌ Uma classe por tipo</h4>
+                        <div class="codigo">public class CaixaDeTexto {
+    private String conteudo;
+
+    public String getConteudo() {
+        return conteudo;
+    }
+
+    public void setConteudo(String conteudo) {
+        this.conteudo = conteudo;
+    }
+}
+
+public class CaixaDeNumero {
+    private Integer conteudo;
+
+    public Integer getConteudo() {
+        return conteudo;
+    }
+
+    public void setConteudo(Integer conteudo) {
+        this.conteudo = conteudo;
+    }
+}</div>
+                    </div>
+                    <div class="comparacao-bom">
+                        <h4>✅ Uma única classe genérica</h4>
+                        <div class="codigo">public class Caixa<T> {
+    private T conteudo;
+
+    public T getConteudo() {
+        return conteudo;
+    }
+
+    public void setConteudo(T conteudo) {
+        this.conteudo = conteudo;
+    }
+}
+
+// Uso:
+Caixa<String> caixaTexto = new Caixa<>();
+Caixa<Integer> caixaNumero = new Caixa<>();</div>
+                    </div>
+                </div>
+
+                <h3>1.6 Reutilização entre Projetos: Bibliotecas e Frameworks</h3>
+                <p>Nem toda reutilização acontece dentro do mesmo projeto. Muita lógica que parece nova (validação de e-mail, formatação de datas, manipulação de coleções, chamadas HTTP) já foi resolvida e testada por bibliotecas amplamente usadas, como Apache Commons, Guava ou as próprias bibliotecas padrão do Java. Antes de escrever uma solução do zero, vale perguntar: "isso já não foi resolvido por alguém?" — gerenciadores de dependência como Maven e Gradle tornam trivial incluir essas bibliotecas em um projeto Java.</p>
+
+                <h3>1.7 Formas de Reutilização — Resumo</h3>
+
+                <div class="table-wrap">
                 <table>
                     <tr>
                         <th>Técnica</th>
@@ -486,29 +739,41 @@ public class Carro {
                         <td><code>Carro</code> tem um <code>Motor</code></td>
                     </tr>
                     <tr>
+                        <td>Generics</td>
+                        <td>Mesma estrutura para tipos diferentes</td>
+                        <td><code>Caixa&lt;T&gt;</code></td>
+                    </tr>
+                    <tr>
                         <td>Bibliotecas/Pacotes</td>
                         <td>Código reutilizável entre projetos</td>
                         <td>Apache Commons, Guava</td>
                     </tr>
                 </table>
+                </div>
 
                 <div class="tip">
                     <strong>💡 Dica:</strong> "Prefira composição a herança" é uma regra clássica — herança acopla fortemente as classes, enquanto composição permite trocar comportamentos com mais liberdade.
                 </div>
             </section>
+        </div>
 
-            <!-- 2. REFATORAÇÃO -->
+        <!-- ===================== TAB: REFATORAÇÃO ===================== -->
+        <div class="tab-panel" id="tab-refactor" role="tabpanel">
             <section>
-                <h2><span class="icon">🔧</span> 2. Refatoração</h2>
+                <h2><span class="icon">🔧</span> Refatoração</h2>
 
-                <p>Refatorar é reorganizar a estrutura interna do código <strong>sem alterar seu comportamento externo</strong>, tornando-o mais limpo, legível e fácil de manter.</p>
+                <p>Refatorar é reorganizar a estrutura interna do código <strong>sem alterar seu comportamento externo</strong>, tornando-o mais limpo, legível e fácil de manter. Ou seja: para quem usa a classe ou o sistema de fora, nada muda; por dentro, o código fica mais organizado.</p>
 
                 <div class="destaque">
-                    <strong>⚠️ Regra de Ouro:</strong> Refatoração muda a forma como o código é escrito, nunca o que ele produz como resultado. Por isso, ter testes antes de refatorar é essencial.
+                    <strong>⚠️ Regra de Ouro:</strong> refatoração muda a forma como o código é escrito, nunca o que ele produz como resultado. Por isso, ter testes automatizados antes de refatorar é essencial — eles são a rede de segurança que garante que o comportamento não mudou.
                 </div>
 
-                <h3>2.1 Quando Refatorar? — Sinais de Alerta ("Code Smells")</h3>
+                <p>Um bom hábito é refatorar em <strong>passos pequenos</strong>: fazer uma mudança isolada, rodar os testes, e só então seguir para a próxima mudança. Esse ciclo curto (mudar → testar → confirmar) reduz drasticamente o risco de introduzir bugs durante a refatoração, e é a mesma lógica por trás do ciclo "red-green-refactor" usado em TDD (Test-Driven Development).</p>
 
+                <h3>2.1 Quando Refatorar? — Sinais de Alerta ("Code Smells")</h3>
+                <p>"Code smell" é um termo popularizado por Martin Fowler para descrever sintomas no código que, embora não sejam bugs, indicam que algo pode estar mal projetado e provavelmente vai causar problemas conforme o sistema cresce.</p>
+
+                <div class="table-wrap">
                 <table>
                     <tr>
                         <th>Sinal</th>
@@ -523,7 +788,7 @@ public class Carro {
                         <td>Uma função faz muitas coisas ao mesmo tempo</td>
                     </tr>
                     <tr>
-                        <td>Classe inchada</td>
+                        <td>Classe inchada (God Class)</td>
                         <td>Uma classe concentra responsabilidades demais</td>
                     </tr>
                     <tr>
@@ -538,9 +803,23 @@ public class Carro {
                         <td>Condicionais aninhados</td>
                         <td>Vários "ifs" um dentro do outro, difíceis de seguir</td>
                     </tr>
+                    <tr>
+                        <td>Feature Envy</td>
+                        <td>Um método usa mais dados de outra classe do que da própria</td>
+                    </tr>
+                    <tr>
+                        <td>Data Clumps</td>
+                        <td>O mesmo grupo de variáveis aparece sempre junto, e deveria virar um objeto</td>
+                    </tr>
+                    <tr>
+                        <td>Shotgun Surgery</td>
+                        <td>Uma pequena mudança de regra obriga a alterar muitos arquivos diferentes</td>
+                    </tr>
                 </table>
+                </div>
 
                 <h3>2.2 Técnica: Extract Method (Extrair Método)</h3>
+                <p>Consiste em pegar um trecho de código com um propósito claro e movê-lo para um método próprio, com nome que explique o que ele faz. É a técnica de refatoração mais usada no dia a dia.</p>
 
                 <div class="comparacao">
                     <div class="comparacao-ruim">
@@ -580,6 +859,7 @@ private void imprimirCabecalho(Pedido pedido, double total) {
                 </div>
 
                 <h3>2.3 Técnica: Renomear para Clareza</h3>
+                <p>Nomes ruins obrigam quem lê o código a "executar" mentalmente a lógica para entender o que ela faz. Um bom nome explica a intenção sem precisar de comentário.</p>
 
                 <div class="comparacao">
                     <div class="comparacao-ruim">
@@ -599,6 +879,7 @@ public double calcularComissao(int quantidadeVendida, double precoUnitario) {
                 </div>
 
                 <h3>2.4 Técnica: Extract Class (Dividir Responsabilidades)</h3>
+                <p>Quando uma classe acumula responsabilidades que não têm relação direta entre si, ela viola o <strong>Princípio da Responsabilidade Única</strong> (Single Responsibility Principle, o "S" do SOLID). A solução é extrair cada responsabilidade para sua própria classe.</p>
 
                 <div class="exemplo">
                     <div class="exemplo-titulo">❌ Uma classe fazendo tudo</div>
@@ -606,10 +887,10 @@ public double calcularComissao(int quantidadeVendida, double precoUnitario) {
     private String nome;
     private String email;
 
-    public boolean validarEmail() { /* ... */ return true; }
-    public void enviarEmailBoasVindas() { /* ... */ }
-    public void salvarNoBanco() { /* ... */ }
-    public String gerarRelatorioPDF() { /* ... */ return ""; }
+    public boolean validarEmail() { return true; }
+    public void enviarEmailBoasVindas() { }
+    public void salvarNoBanco() { }
+    public String gerarRelatorioPDF() { return ""; }
 }</div>
                 </div>
 
@@ -618,23 +899,24 @@ public double calcularComissao(int quantidadeVendida, double precoUnitario) {
                     <div class="codigo">public class Usuario {
     private String nome;
     private String email;
-    // apenas dados e regras do próprio usuário
+    // apenas dados e regras do proprio usuario
 }
 
 public class ValidadorEmail {
-    public boolean validar(String email) { /* ... */ return true; }
+    public boolean validar(String email) { return true; }
 }
 
 public class EmailService {
-    public void enviarBoasVindas(Usuario usuario) { /* ... */ }
+    public void enviarBoasVindas(Usuario usuario) { }
 }
 
 public class UsuarioRepository {
-    public void salvar(Usuario usuario) { /* ... */ }
+    public void salvar(Usuario usuario) { }
 }</div>
                 </div>
 
                 <h3>2.5 Técnica: Substituir Números Mágicos por Constantes</h3>
+                <p>Um "número mágico" é um valor literal (como <code>18</code> ou <code>0.05</code>) espalhado pelo código sem explicação. Dar um nome a ele documenta a intenção e evita que o mesmo valor seja digitado (e eventualmente errado) em vários lugares.</p>
 
                 <div class="comparacao">
                     <div class="comparacao-ruim">
@@ -659,6 +941,7 @@ double desconto = preco * TAXA_DESCONTO;</div>
                 </div>
 
                 <h3>2.6 Técnica: Simplificar Condicionais</h3>
+                <p>Condicionais aninhados são difíceis de acompanhar porque exigem manter várias condições "na cabeça" ao mesmo tempo. Extrair a condição composta para uma variável (ou método) bem nomeado reduz a carga mental de leitura.</p>
 
                 <div class="comparacao">
                     <div class="comparacao-ruim">
@@ -683,64 +966,42 @@ if (podeComprar) {
                     </div>
                 </div>
 
-                <h3>2.7 Regra dos Três</h3>
+                <h3>2.7 Técnica: Substituir Loops por Stream API</h3>
+                <p>No Java moderno (a partir da versão 8), a Stream API permite expressar operações sobre coleções — filtrar, transformar, somar — de forma mais declarativa, muitas vezes eliminando variáveis auxiliares e reduzindo a chance de erro em laços manuais.</p>
 
+                <div class="comparacao">
+                    <div class="comparacao-ruim">
+                        <h4>❌ Antes</h4>
+                        <div class="codigo">double total = 0;
+for (Item item : itens) {
+    if (item.getQuantidade() > 0) {
+        total += item.getPreco() * item.getQuantidade();
+    }
+}</div>
+                    </div>
+                    <div class="comparacao-bom">
+                        <h4>✅ Depois</h4>
+                        <div class="codigo">double total = itens.stream()
+        .filter(item -> item.getQuantidade() > 0)
+        .mapToDouble(item -> item.getPreco() * item.getQuantidade())
+        .sum();</div>
+                    </div>
+                </div>
+
+                <h3>2.8 Regra dos Três</h3>
                 <div class="destaque">
                     <strong>💡 Regra dos Três:</strong> na primeira vez, apenas escreva o código. Na segunda vez que precisar de algo parecido, copie e siga em frente. Na terceira vez, é hora de refatorar e extrair a lógica comum.
                 </div>
+                <p>Essa regra evita dois extremos ruins: generalizar cedo demais (criando abstrações para um caso que nunca se repete) e nunca generalizar (deixando a duplicação crescer sem controle). Ela existe porque abstrair na primeira ou segunda repetição costuma levar a uma abstração errada — na terceira vez, já se tem informação suficiente para saber o que realmente é comum entre os casos.</p>
             </section>
+        </div>
 
-            <!-- 3. CHECKLIST -->
+        <!-- ===================== TAB: EXEMPLO COMPLETO ===================== -->
+        <div class="tab-panel" id="tab-example" role="tabpanel">
             <section>
-                <h2><span class="icon">✅</span> 3. Checklist Prático</h2>
+                <h2><span class="icon">📚</span> Exemplo Completo</h2>
 
-                <p>Antes de considerar o código pronto, verifique:</p>
-
-                <table>
-                    <tr>
-                        <th>Categoria</th>
-                        <th>Verificações</th>
-                    </tr>
-                    <tr>
-                        <td><strong>Reutilização</strong></td>
-                        <td>
-                            ✓ Existe lógica repetida em mais de um lugar?<br>
-                            ✓ Essa lógica poderia virar um método?<br>
-                            ✓ Faz sentido usar herança, interface ou composição aqui?<br>
-                            ✓ Já existe uma biblioteca que resolve isso?
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><strong>Tamanho</strong></td>
-                        <td>
-                            ✓ Métodos com até 20-30 linhas?<br>
-                            ✓ Classes com uma responsabilidade clara?<br>
-                            ✓ Poucos parâmetros por método?
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><strong>Nomenclatura</strong></td>
-                        <td>
-                            ✓ Nomes explicam o propósito sem precisar de comentário?<br>
-                            ✓ Sem abreviações confusas?
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><strong>Segurança da Refatoração</strong></td>
-                        <td>
-                            ✓ Existem testes cobrindo o comportamento atual?<br>
-                            ✓ O comportamento externo continua o mesmo depois da mudança?<br>
-                            ✓ Cada refatoração foi feita em passos pequenos?
-                        </td>
-                    </tr>
-                </table>
-            </section>
-
-            <!-- 4. EXEMPLO COMPLETO -->
-            <section>
-                <h2><span class="icon">📚</span> 4. Exemplo Completo</h2>
-
-                <p>Veja como aplicar reutilização e refatoração juntas:</p>
+                <p>Veja como aplicar reutilização e refatoração juntas em um caso realista: processar uma lista de itens de pedido, calcular o total com desconto e avisar quando o cliente é VIP.</p>
 
                 <h3>Antes (Sem Boas Práticas)</h3>
                 <div class="exemplo">
@@ -765,6 +1026,17 @@ if (podeComprar) {
 }</div>
                 </div>
 
+                <div class="ruim">
+                    <strong>Problemas nesta versão:</strong>
+                    <ul style="margin-top: 10px; margin-left: 20px;">
+                        <li>Nomes sem significado: classe <code>P</code>, método <code>proc</code>, variáveis <code>t</code>, <code>p</code>, <code>q</code></li>
+                        <li>Usa <code>Map&lt;String, Object&gt;</code> em vez de um tipo próprio — exige casts frágeis como <code>(double) i.get("preco")</code>, que quebram em tempo de execução se o dado vier errado</li>
+                        <li>Um único método faz quatro coisas: somar, aplicar desconto, imprimir e checar VIP</li>
+                        <li>Números mágicos (<code>100</code>, <code>0.1</code>, <code>500</code>) sem explicação do que representam</li>
+                        <li>Impossível reaproveitar só o cálculo do total em outro lugar do sistema sem reaproveitar também a impressão</li>
+                    </ul>
+                </div>
+
                 <h3>Depois (Com Boas Práticas)</h3>
                 <div class="exemplo">
                     <div class="codigo">// ==================== PROCESSAMENTO DE PEDIDOS ====================
@@ -783,15 +1055,10 @@ public class ProcessadorPedido {
     }
 
     private double calcularTotal(List<ItemPedido> itens) {
-        double total = 0;
-
-        for (ItemPedido item : itens) {
-            if (item.getQuantidade() > 0) {
-                total += item.getPreco() * item.getQuantidade();
-            }
-        }
-
-        return total;
+        return itens.stream()
+                .filter(item -> item.getQuantidade() > 0)
+                .mapToDouble(item -> item.getPreco() * item.getQuantidade())
+                .sum();
     }
 
     private double aplicarDesconto(double total) {
@@ -811,96 +1078,300 @@ public class ProcessadorPedido {
 }</div>
                 </div>
 
+                <h3>Passo a passo do que mudou e por quê</h3>
+                <ul class="lista-pontos">
+                    <li><strong>Renomear (2.3):</strong> <code>P</code> virou <code>ProcessadorPedido</code>, <code>proc</code> virou <code>processarPedido</code> — agora o nome da classe e do método já dizem o que eles fazem.</li>
+                    <li><strong>Tipo próprio em vez de Map:</strong> <code>List&lt;Map&lt;String, Object&gt;&gt;</code> foi trocado por <code>List&lt;ItemPedido&gt;</code>, eliminando os casts perigosos e deixando o compilador Java garantir os tipos corretos.</li>
+                    <li><strong>Extract Method (2.2):</strong> o método original foi dividido em <code>calcularTotal</code>, <code>aplicarDesconto</code> e <code>exibirResultado</code> — cada um faz uma coisa só e pode ser testado isoladamente.</li>
+                    <li><strong>Números mágicos → constantes (2.5):</strong> <code>100</code>, <code>0.1</code> e <code>500</code> viraram <code>LIMITE_DESCONTO</code>, <code>TAXA_DESCONTO</code> e <code>LIMITE_VIP</code>, documentando o que cada valor representa.</li>
+                    <li><strong>Loop → Stream API (2.7):</strong> o laço manual de soma virou uma cadeia de <code>filter</code>/<code>mapToDouble</code>/<code>sum</code>, mais declarativa e com menos chance de erro de acumulador.</li>
+                    <li><strong>Reutilização:</strong> agora <code>calcularTotal</code> pode ser chamado de outros pontos do sistema (por exemplo, para mostrar um resumo antes de confirmar o pedido) sem precisar reescrever a lógica de soma.</li>
+                </ul>
+
                 <div class="bom">
                     <strong>Melhorias Aplicadas:</strong>
-                    <ul style="margin-top: 10px;">
-                        <li>✓ Nomes descritivos (P → ProcessadorPedido, proc → processarPedido)</li>
-                        <li>✓ Tipos específicos em vez de <code>Map&lt;String, Object&gt;</code> (uso de <code>ItemPedido</code>)</li>
+                    <ul style="margin-top: 10px; margin-left: 20px;">
+                        <li>✓ Nomes descritivos em toda a classe</li>
+                        <li>✓ Tipo específico <code>ItemPedido</code> em vez de <code>Map&lt;String, Object&gt;</code></li>
                         <li>✓ Método dividido por responsabilidade (Extract Method)</li>
                         <li>✓ Números mágicos substituídos por constantes nomeadas</li>
-                        <li>✓ Cada método faz apenas uma coisa</li>
+                        <li>✓ Cada método faz apenas uma coisa (fácil de testar isoladamente)</li>
                         <li>✓ Comentário de seção organiza a leitura</li>
+                        <li>✓ Lógica de soma pronta para ser reutilizada em outros pontos do sistema</li>
                     </ul>
                 </div>
             </section>
+        </div>
 
-            <!-- 5. FERRAMENTAS -->
+        <!-- ===================== TAB: FERRAMENTAS ===================== -->
+        <div class="tab-panel" id="tab-tools" role="tabpanel">
             <section>
-                <h2><span class="icon">🛠️</span> 5. Ferramentas Recomendadas</h2>
+                <h2><span class="icon">🛠️</span> Ferramentas Recomendadas</h2>
 
+                <p>Refatorar e evitar duplicação não depende só de disciplina — o ecossistema de cada linguagem oferece ferramentas que automatizam refatorações comuns (como Extract Method e Rename) e detectam code smells automaticamente. Abaixo estão as principais ferramentas para Java e para outras linguagens populares, para você reconhecer os equivalentes caso trabalhe em um time multi-linguagem.</p>
+
+                <h3><span class="lang-badge">Java</span> Ferramental do exemplo deste material</h3>
+                <div class="table-wrap">
                 <table>
                     <tr>
                         <th>Ferramenta</th>
                         <th>Propósito</th>
-                        <th>Contexto</th>
                     </tr>
                     <tr>
                         <td><strong>IntelliJ IDEA</strong></td>
-                        <td>Menu "Refactor" com Extract Method, Rename e mais</td>
-                        <td>Java</td>
+                        <td>Menu "Refactor" com Extract Method, Rename, Extract Class e mais, aplicados automaticamente em todo o projeto</td>
                     </tr>
                     <tr>
                         <td><strong>Eclipse</strong></td>
-                        <td>Menu "Refactor" para renomear, extrair e mover código</td>
-                        <td>Java</td>
-                    </tr>
-                    <tr>
-                        <td><strong>SonarLint / SonarQube</strong></td>
-                        <td>Detecta duplicação de código e code smells</td>
-                        <td>Múltiplas linguagens</td>
+                        <td>Menu "Refactor" para renomear, extrair e mover código entre classes</td>
                     </tr>
                     <tr>
                         <td><strong>PMD / Checkstyle</strong></td>
-                        <td>Análise estática de código Java</td>
-                        <td>Java</td>
+                        <td>Análise estática: detecta métodos longos, complexidade alta e violações de convenção</td>
                     </tr>
                     <tr>
-                        <td><strong>JUnit</strong></td>
-                        <td>Garante que a refatoração não muda o comportamento</td>
-                        <td>Java</td>
+                        <td><strong>JUnit / Mockito</strong></td>
+                        <td>Testes automatizados que garantem que a refatoração não mudou o comportamento</td>
                     </tr>
                     <tr>
-                        <td><strong>Git</strong></td>
-                        <td>Versiona o código antes de refatorar, permitindo reverter</td>
-                        <td>Todos os projetos</td>
+                        <td><strong>Maven / Gradle</strong></td>
+                        <td>Gerenciam dependências, facilitando reutilizar bibliotecas prontas em vez de reescrever soluções</td>
                     </tr>
                 </table>
+                </div>
+
+                <h3>Equivalentes em Outras Linguagens</h3>
+                <p>Os mesmos problemas — duplicação, métodos longos, nomes ruins — existem em qualquer linguagem, e cada ecossistema tem suas próprias ferramentas para lidar com eles. Note que apenas as ferramentas mudam de linguagem para linguagem; os <em>conceitos</em> (DRY, Extract Method, code smells) são os mesmos em qualquer lugar.</p>
+
+                <div class="table-wrap">
+                <table>
+                    <tr>
+                        <th>Linguagem</th>
+                        <th>Ferramenta</th>
+                        <th>Propósito</th>
+                    </tr>
+                    <tr>
+                        <td><span class="lang-badge">Python</span></td>
+                        <td><strong>PyCharm / VS Code + Rope</strong></td>
+                        <td>Refatorações automáticas (rename, extract method/variable)</td>
+                    </tr>
+                    <tr>
+                        <td><span class="lang-badge">Python</span></td>
+                        <td><strong>Pylint / Flake8 / Ruff</strong></td>
+                        <td>Análise estática e detecção de code smells</td>
+                    </tr>
+                    <tr>
+                        <td><span class="lang-badge">Python</span></td>
+                        <td><strong>Black</strong></td>
+                        <td>Formatação automática e consistente de código</td>
+                    </tr>
+                    <tr>
+                        <td><span class="lang-badge">JavaScript / TypeScript</span></td>
+                        <td><strong>ESLint</strong></td>
+                        <td>Detecta código problemático e aplica boas práticas</td>
+                    </tr>
+                    <tr>
+                        <td><span class="lang-badge">JavaScript / TypeScript</span></td>
+                        <td><strong>Prettier</strong></td>
+                        <td>Formatação automática de código</td>
+                    </tr>
+                    <tr>
+                        <td><span class="lang-badge">JavaScript / TypeScript</span></td>
+                        <td><strong>VS Code (refactor menu)</strong></td>
+                        <td>Extract function/variable, rename symbol integrados ao editor</td>
+                    </tr>
+                    <tr>
+                        <td><span class="lang-badge">C#</span></td>
+                        <td><strong>ReSharper / Rider</strong></td>
+                        <td>Refatorações avançadas e detecção de duplicação para o ecossistema .NET</td>
+                    </tr>
+                    <tr>
+                        <td><span class="lang-badge">C#</span></td>
+                        <td><strong>Visual Studio (refactor menu)</strong></td>
+                        <td>Extract Method, Rename e Quick Actions nativos da IDE</td>
+                    </tr>
+                    <tr>
+                        <td><span class="lang-badge">Ruby</span></td>
+                        <td><strong>RuboCop</strong></td>
+                        <td>Linter e formatter com foco em estilo e boas práticas da comunidade Ruby</td>
+                    </tr>
+                    <tr>
+                        <td><span class="lang-badge">Go</span></td>
+                        <td><strong>gofmt / goimports</strong></td>
+                        <td>Formatação automática e organização de imports, padrão da linguagem</td>
+                    </tr>
+                    <tr>
+                        <td><span class="lang-badge">Go</span></td>
+                        <td><strong>golangci-lint</strong></td>
+                        <td>Suíte de linters que detecta duplicação e código morto</td>
+                    </tr>
+                    <tr>
+                        <td><span class="lang-badge">Rust</span></td>
+                        <td><strong>rustfmt</strong></td>
+                        <td>Formatação automática seguindo o estilo oficial da linguagem</td>
+                    </tr>
+                    <tr>
+                        <td><span class="lang-badge">Rust</span></td>
+                        <td><strong>Clippy</strong></td>
+                        <td>Linter que sugere refatorações idiomáticas e aponta code smells</td>
+                    </tr>
+                    <tr>
+                        <td><span class="lang-badge">Multi-linguagem</span></td>
+                        <td><strong>SonarQube / SonarLint</strong></td>
+                        <td>Detecta duplicação de código, complexidade e code smells em dezenas de linguagens</td>
+                    </tr>
+                    <tr>
+                        <td><span class="lang-badge">Multi-linguagem</span></td>
+                        <td><strong>Git</strong></td>
+                        <td>Versiona o código antes de refatorar, permitindo reverter mudanças com segurança</td>
+                    </tr>
+                </table>
+                </div>
 
                 <div class="tip">
-                    <strong>💡 Dica:</strong> Sempre tenha testes (ou pelo menos um commit salvo) antes de refatorar. Assim, se algo sair errado, é fácil voltar atrás.
+                    <strong>💡 Dica:</strong> sempre tenha testes automatizados (ou pelo menos um commit salvo no Git) antes de refatorar. Assim, se algo sair errado, é fácil comparar o comportamento antes/depois ou simplesmente voltar atrás.
                 </div>
             </section>
+        </div>
 
-            <!-- 6. REFERÊNCIA RÁPIDA -->
+        <!-- ===================== TAB: CHECKLIST ===================== -->
+        <div class="tab-panel" id="tab-checklist" role="tabpanel">
             <section>
-                <h2><span class="icon">📋</span> 6. Referência Rápida</h2>
+                <h2><span class="icon">✅</span> Checklist Prático</h2>
 
-                <div class="princípios">
-                    <div class="princípio-card">
+                <p>Antes de considerar o código pronto para revisão ou entrega, verifique os pontos abaixo:</p>
+
+                <div class="table-wrap">
+                <table>
+                    <tr>
+                        <th>Categoria</th>
+                        <th>Verificações</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Reutilização</strong></td>
+                        <td>
+                            ✓ Existe lógica repetida em mais de um lugar?<br>
+                            ✓ Essa lógica poderia virar um método?<br>
+                            ✓ Faz sentido usar herança, interface, composição ou generics aqui?<br>
+                            ✓ Já existe uma biblioteca que resolve isso?
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Tamanho</strong></td>
+                        <td>
+                            ✓ Métodos com até 20-30 linhas?<br>
+                            ✓ Classes com uma responsabilidade clara?<br>
+                            ✓ Poucos parâmetros por método?
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Nomenclatura</strong></td>
+                        <td>
+                            ✓ Nomes explicam o propósito sem precisar de comentário?<br>
+                            ✓ Sem abreviações confusas?<br>
+                            ✓ Sem números mágicos sem nome?
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Segurança da Refatoração</strong></td>
+                        <td>
+                            ✓ Existem testes cobrindo o comportamento atual?<br>
+                            ✓ O comportamento externo continua o mesmo depois da mudança?<br>
+                            ✓ Cada refatoração foi feita em passos pequenos?<br>
+                            ✓ Há um commit salvo antes de começar, caso precise reverter?
+                        </td>
+                    </tr>
+                </table>
+                </div>
+
+                <div class="resumo-box">
+                    <strong>Como usar este checklist:</strong>
+                    <ul>
+                        <li>Durante o desenvolvimento: revise mentalmente enquanto escreve.</li>
+                        <li>Antes de um commit importante: passe pela lista item a item.</li>
+                        <li>Em revisões de código (code review): use como roteiro para dar feedback objetivo.</li>
+                    </ul>
+                </div>
+            </section>
+        </div>
+
+        <!-- ===================== TAB: REFERÊNCIA RÁPIDA ===================== -->
+        <div class="tab-panel" id="tab-reference" role="tabpanel">
+            <section>
+                <h2><span class="icon">📋</span> Referência Rápida</h2>
+
+                <p>Resumo visual dos conceitos mais importantes deste material.</p>
+
+                <div class="principios">
+                    <div class="principio-card">
                         <h4>♻️ DRY</h4>
-                        <p>Não repita lógica. Cada regra deve existir em um único lugar.</p>
+                        <p>Não repita conhecimento. Cada regra de negócio deve existir em um único lugar.</p>
                     </div>
-                    <div class="princípio-card">
+                    <div class="principio-card">
                         <h4>🧬 Herança</h4>
-                        <p>Use quando existe uma relação "é um" entre as classes.</p>
+                        <p>Use quando existe uma relação "é um" verdadeira entre as classes.</p>
                     </div>
-                    <div class="princípio-card">
+                    <div class="principio-card">
                         <h4>🧩 Composição</h4>
-                        <p>Use quando existe uma relação "tem um" e comportamento flexível.</p>
+                        <p>Use quando existe uma relação "tem um" e o comportamento precisa ser flexível.</p>
                     </div>
-                    <div class="princípio-card">
+                    <div class="principio-card">
+                        <h4>🔌 Interfaces</h4>
+                        <p>Definem um contrato comum entre classes sem parentesco, habilitando polimorfismo.</p>
+                    </div>
+                    <div class="principio-card">
                         <h4>🔧 Refatoração</h4>
-                        <p>Mude a estrutura, nunca o comportamento. Sempre em passos pequenos.</p>
+                        <p>Mude a estrutura, nunca o comportamento. Sempre em passos pequenos, com testes.</p>
+                    </div>
+                    <div class="principio-card">
+                        <h4>👃 Code Smell</h4>
+                        <p>Sintoma de código mal projetado: duplicação, métodos longos, nomes ruins, condicionais aninhados.</p>
+                    </div>
+                    <div class="principio-card">
+                        <h4>✂️ Extract Method</h4>
+                        <p>A refatoração mais comum: mover um trecho com propósito claro para um método próprio.</p>
+                    </div>
+                    <div class="principio-card">
+                        <h4>3️⃣ Regra dos Três</h4>
+                        <p>Na terceira repetição de uma lógica parecida, extraia a parte comum.</p>
                     </div>
                 </div>
             </section>
+        </div>
 
-        </main>
+    </main>
 
-        <footer>
-            <p>📚 Reutilização de Código e Refatoração | Boas Práticas de Programação</p>
-            <p style="margin-top: 10px; font-size: 0.9em;">💡 "Refatorar é como arrumar a casa: os móveis continuam com a mesma função, só o espaço fica mais organizado."</p>
-        </footer>
-    </div>
+    <footer>
+        <p>📚 Reutilização de Código e Refatoração | Boas Práticas de Programação</p>
+        <p style="margin-top: 10px; font-size: 0.9em;">💡 "Refatorar é como arrumar a casa: os móveis continuam com a mesma função, só o espaço fica mais organizado."</p>
+    </footer>
+</div>
+
+<script>
+    (function () {
+        var buttons = document.querySelectorAll('.tab-btn');
+        var panels = document.querySelectorAll('.tab-panel');
+
+        function activate(tabId) {
+            panels.forEach(function (panel) {
+                panel.classList.toggle('active', panel.id === tabId);
+            });
+            buttons.forEach(function (btn) {
+                var isActive = btn.getAttribute('data-tab') === tabId;
+                btn.classList.toggle('active', isActive);
+                btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+            });
+            var main = document.querySelector('main');
+            if (main) { main.scrollTop = 0; }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        buttons.forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                activate(btn.getAttribute('data-tab'));
+            });
+        });
+    })();
+</script>
 </body>
 </html>
