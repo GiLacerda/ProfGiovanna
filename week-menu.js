@@ -1,24 +1,3 @@
-/**
- * Busca automaticamente as pastas de conteúdo dentro de uma matéria (FrontEnd, Mobile, PWIII...)
- * usando a API pública do GitHub, e monta os botões de navegação.
- *
- * Uso — pastas "SemanaXX" (FrontEnd, Mobile):
- *   <div class="links">
- *     <a class="week" href="Semana18/index.html">Semana 18</a>  <!-- fica como fallback -->
- *   </div>
- *   <script src="../week-menu.js"></script>
- *   <script>renderWeekMenu('FrontEnd', '.links');</script>
- *
- * Uso — pastas por data "DD-MM" (PWIII):
- *   <div class="links">
- *     <a class="date" href="13-08/index.html">13/08</a>  <!-- fica como fallback -->
- *   </div>
- *   <script src="../week-menu.js"></script>
- *   <script>renderWeekMenu('PWIII', '.links', { mode: 'date', linkClass: 'date' });</script>
- *
- * Se a API do GitHub não responder (limite de requisições, sem internet etc.), o script
- * simplesmente não mexe em nada e os links fixos que já estão no HTML continuam funcionando.
- */
 (function () {
   var OWNER = 'GiLacerda';
   var REPO = 'ProfGiovanna';
@@ -40,17 +19,19 @@
         return nums ? parseInt(nums[0], 10) : 0;
       }
     },
-    // "13-08" (dia-mês) -> "13/08"
+    // "2026-08-06-Aula01" ou "2026-08-06-Aula-01" -> "Aula 01: 06/08"
+    // (o hífen antes do número é opcional, pra aceitar as duas formas usadas nas pastas)
     date: {
-      match: /^\d{4}-\d{2}-\d{2}-Aula\d{2}$/,
+      match: /^\d{4}-\d{2}-\d{2}-Aula-?\d{2}$/,
       label: function (name) {
-        var parts = name.split('-'); // [ano, mes, dia, "AulaNN"]
-        var aula = parts[3].replace('Aula', ''); // "01"
-        return 'Aula ' + aula + ': ' + parts[2] + '/' + parts[1];
+        var m = name.match(/^(\d{4})-(\d{2})-(\d{2})-Aula-?(\d{2})$/);
+        if (!m) return name;
+        return 'Aula ' + m[4] + ': ' + m[3] + '/' + m[2];
       },
       sortKey: function (name) {
-        var parts = name.split('-'); // [ano, mes, dia, "AulaNN"]
-        return Number(parts[0]) * 10000 + Number(parts[1]) * 100 + Number(parts[2]); // ordena por ano, mês, dia
+        var m = name.match(/^(\d{4})-(\d{2})-(\d{2})-Aula-?(\d{2})$/);
+        if (!m) return 0;
+        return Number(m[1]) * 10000 + Number(m[2]) * 100 + Number(m[3]); // ordena por ano, mês, dia
       }
     }
   };
