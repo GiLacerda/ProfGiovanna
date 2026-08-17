@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PHP - Listagem e Cadastro</title>
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --card: #ffffff;
+      --primary: #1f6feb;
+      --primary-dark: #174ea6;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --border: #dfe7f1;
+      --success: #0f9f6e;
+      --warning: #f59e0b;
+      --shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    .container {
+      width: min(1100px, 92%);
+      margin: 40px auto;
+    }
+
+    h1, h2, h3 {
+      color: var(--text);
+      margin-top: 0;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 22px 24px;
+      box-shadow: var(--shadow);
+      margin-bottom: 24px;
+    }
+
+    .small {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .btn {
+      display: inline-block;
+      text-decoration: none;
+      background: var(--primary);
+      color: white;
+      padding: 10px 16px;
+      border-radius: 9px;
+      font-weight: 600;
+      margin-top: 12px;
+    }
+
+    .btn:hover {
+      background: var(--primary-dark);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 14px;
+    }
+
+    th, td {
+      border: 1px solid var(--border);
+      padding: 10px 12px;
+      text-align: left;
+    }
+
+    th {
+      background: #eef4ff;
+    }
+
+    pre {
+      background: #111827;
+      color: #e5e7eb;
+      border-radius: 12px;
+      padding: 16px;
+      overflow-x: auto;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    code {
+      font-family: "Courier New", monospace;
+    }
+
+    form {
+      display: grid;
+      gap: 12px;
+      max-width: 520px;
+      margin-top: 10px;
+    }
+
+    label {
+      display: grid;
+      gap: 7px;
+      font-weight: 600;
+    }
+
+    input, button {
+      padding: 10px 12px;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+
+    button {
+      background: var(--success);
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .exemplo {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 18px;
+    }
+
+    @media (max-width: 800px) {
+      .exemplo {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>PHP: listagem de dados e tela de cadastro</h1>
+    <p class="small">
+      Material didático simples para explicar a lógica de uma tela de listagem e cadastro.
+      Aqui não entra filtro, paginação, validação avançada nem camada de segurança.
+      O objetivo é mostrar o fluxo básico e a lógica da programação.
+    </p>
+
+    <div class="card">
+      <h2>1) Ideia geral</h2>
+      <p>
+        Em uma aplicação web com PHP, normalmente a lógica é esta:
+      </p>
+      <ul>
+        <li>Conectar ao banco de dados.</li>
+        <li>Executar uma consulta SQL.</li>
+        <li>Receber os resultados.</li>
+        <li>Montar a tela HTML.</li>
+        <li>Mostrar os dados em uma tabela.</li>
+      </ul>
+      <p>
+        A parte importante é entender que o PHP serve para preparar os dados e o HTML serve
+        para apresentar esses dados em tela. O PHP não "cria a página como no Photoshop"; ele
+        gera código HTML dinamicamente.
+      </p>
+    </div>
+
+    <div class="card">
+      <h2>2) Exemplo simples de listagem</h2>
+      <div class="exemplo">
+        <div>
+          <p>Suponha que a tabela do banco seja <strong>clientes</strong>:</p>
+          <pre><code>CREATE TABLE clientes (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  nome VARCHAR(100),
+  email VARCHAR(100),
+  telefone VARCHAR(20)
+);</code></pre>
+
+          <p>Exemplo de dados:</p>
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nome</th>
+                <th>E-mail</th>
+                <th>Telefone</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td>Maria Silva</td>
+                <td>maria@email.com</td>
+                <td>(11) 99999-1111</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>João Souza</td>
+                <td>joao@email.com</td>
+                <td>(11) 98888-2222</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div>
+          <p class="small">O que a tela precisa fazer:</p>
+          <ul>
+            <li>Buscar os clientes no banco.</li>
+            <li>Guardar em uma variável.</li>
+            <li>Loopar os dados.</li>
+            <li>Gerar cada linha da tabela.</li>
+          </ul>
+          <a class="btn" href="#php-listagem">Ver o código PHP</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" id="php-listagem">
+      <h2>3) Código PHP da listagem</h2>
+      <pre><code>&lt;?php
+$host = 'localhost';
+$user = 'root';
+$password = '';
+$dbname = 'aula_php';
+
+$conn = new mysqli($host, $user, $password, $dbname);
+
+if ($conn-&gt;connect_error) {
+    die('Erro na conexão: ' . $conn-&gt;connect_error);
+}
+
+$sql = 'SELECT id, nome, email, telefone FROM clientes ORDER BY nome';
+$result = $conn-&gt;query($sql);
+?&gt;
+
+&lt;table&gt;
+    &lt;thead&gt;
+        &lt;tr&gt;
+            &lt;th&gt;ID&lt;/th&gt;
+            &lt;th&gt;Nome&lt;/th&gt;
+            &lt;th&gt;E-mail&lt;/th&gt;
+            &lt;th&gt;Telefone&lt;/th&gt;
+        &lt;/tr&gt;
+    &lt;/thead&gt;
+    &lt;tbody&gt;
+        &lt;?php while ($cliente = $result-&gt;fetch_assoc()) { ?&gt;
+            &lt;tr&gt;
+                &lt;td&gt;&lt;?php echo $cliente['id']; ?&gt;&lt;/td&gt;
+                &lt;td&gt;&lt;?php echo $cliente['nome']; ?&gt;&lt;/td&gt;
+                &lt;td&gt;&lt;?php echo $cliente['email']; ?&gt;&lt;/td&gt;
+                &lt;td&gt;&lt;?php echo $cliente['telefone']; ?&gt;&lt;/td&gt;
+            &lt;/tr&gt;
+        &lt;?php } ?&gt;
+    &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;?php
+$conn-&gt;close();
+?&gt;</code></pre>
+
+      <p>
+        Este é o padrão básico: <strong>PHP consulta</strong> e <strong>HTML exibe</strong>.
+        O <strong>while</strong> percorre cada linha retornada pelo banco e cria uma linha na tabela.
+      </p>
+    </div>
+
+    <div class="card">
+      <h2>4) Como explicar isso para alunos</h2>
+      <p>
+        A melhor forma de ensinar é mostrar a separação de responsabilidades:
+      </p>
+      <ul>
+        <li><strong>Banco de dados</strong>: guarda os dados.</li>
+        <li><strong>PHP</strong>: conversa com o banco e traz os dados.</li>
+        <li><strong>HTML</strong>: estrutura a tela.</li>
+        <li><strong>PHP + HTML</strong>: mistura os dados dentro da página.</li>
+      </ul>
+      <p>
+        Se o aluno não entender, peça que ele responda: “Qual é a etapa 1? Conectar. Etapa 2? Consultar.
+        Etapa 3? Mostrar.” Isso ajuda a quebrar a lógica em passos simples.
+      </p>
+    </div>
+
+    <div class="card">
+      <h2>5) Tela de cadastro</h2>
+      <p>
+        Agora, para cadastrar, normalmente existem duas telas (ou duas partes da mesma tela):
+      </p>
+      <ol>
+        <li>Uma página com o formulário.</li>
+        <li>Uma página que recebe os dados enviados e insere no banco.</li>
+      </ol>
+
+      <h3>Formulário HTML</h3>
+      <pre><code>&lt;form action="salvar_cliente.php" method="POST"&gt;
+    &lt;label&gt;
+        Nome:
+        &lt;input type="text" name="nome" required&gt;
+    &lt;/label&gt;
+
+    &lt;label&gt;
+        E-mail:
+        &lt;input type="email" name="email" required&gt;
+    &lt;/label&gt;
+
+    &lt;label&gt;
+        Telefone:
+        &lt;input type="text" name="telefone"&gt;
+    &lt;/label&gt;
+
+    &lt;button type="submit"&gt;Salvar&lt;/button&gt;
+&lt;/form&gt;</code></pre>
+
+      <h3>Arquivo salvar_cliente.php</h3>
+      <pre><code>&lt;?php
+$host = 'localhost';
+$user = 'root';
+$password = '';
+$dbname = 'aula_php';
+
+$conn = new mysqli($host, $user, $password, $dbname);
+
+if ($conn-&gt;connect_error) {
+    die('Erro na conexão: ' . $conn-&gt;connect_error);
+}
+
+$nome = $_POST['nome'];
+$email = $_POST['email'];
+$telefone = $_POST['telefone'];
+
+$sql = "INSERT INTO clientes (nome, email, telefone) VALUES ('$nome', '$email', '$telefone')";
+
+if ($conn-&gt;query($sql) === TRUE) {
+    echo 'Cadastro realizado com sucesso!';
+} else {
+    echo 'Erro ao cadastrar: ' . $conn-&gt;error;
+}
+
+$conn-&gt;close();
+?&gt;</code></pre>
+
+      <p>
+        A lógica aqui é simples: o browser envia os dados do formulário para o PHP via <strong>POST</strong>.
+        O PHP pega os valores com <strong>$_POST</strong> e grava no banco com um <strong>INSERT</strong>.
+      </p>
+    </div>
+
+    <div class="card">
+      <h2>6) Qual é a lógica para seguir?</h2>
+      <p>Para a maioria dos exercícios simples, siga este mapa mental:</p>
+
+      <ol>
+        <li><strong>Defina a tabela</strong> e os campos que vão aparecer.</li>
+        <li><strong>Crie a página de listagem</strong> com estrutura HTML.</li>
+        <li><strong>Faça a conexão com o banco</strong> em PHP.</li>
+        <li><strong>Escreva a consulta SQL</strong> para buscar os dados.</li>
+        <li><strong>Use um loop</strong> para percorrer os registros.</li>
+        <li><strong>Imprima as linhas da tabela</strong> dentro do HTML.</li>
+        <li><strong>Crie um formulário</strong> para receber os dados.</li>
+        <li><strong>Crie outra página PHP</strong> para tratar o envio.</li>
+        <li><strong>Use INSERT</strong> para gravar os dados.</li>
+        <li><strong>Redirecione ou mostre uma mensagem de sucesso</strong>.</li>
+      </ol>
+
+      <p>
+        Em sala, esse passo a passo costuma funcionar melhor do que mostrar “um código pronto”
+        logo de início. Primeiro o aluno precisa entender o fluxo: <strong>formulário → envio → PHP → banco → resposta</strong>.
+      </p>
+    </div>
+
+    <div class="card">
+      <h2>7) Lógica de fluxo completa</h2>
+      <pre><code>Usuário abre a página de listagem
+        ↓
+PHP conecta no banco
+        ↓
+SELECT busca os dados
+        ↓
+PHP gera o HTML com a tabela
+        ↓
+Usuário clica em “Cadastrar”
+        ↓
+Formulário envia dados para salvar.php
+        ↓
+PHP recebe os dados com $_POST
+        ↓
+INSERT salva no banco
+        ↓
+Página mostra mensagem de sucesso ou volta para listagem</code></pre>
+    </div>
+
+    <div class="card">
+      <h2>8) Dica importante para o professor</h2>
+      <p>
+        Se os alunos estão “colando IA” e não entendendo, o melhor é exigir que eles expliquem cada linha.
+        Perguntas simples ajudam:
+      </p>
+      <ul>
+        <li>O que é esse <strong>SELECT</strong>?</li>
+        <li>Para que serve o <strong>while</strong>?</li>
+        <li>Quem envia os dados do formulário?</li>
+        <li>O que é o <strong>$_POST</strong>?</li>
+        <li>O que a função <strong>INSERT</strong> faz?</li>
+      </ul>
+      <p>
+        Quando o aluno consegue responder isso sem olhar o código, ele já entendeu o básico.
+      </p>
+    </div>
+  </div>
+</body>
+</html>
