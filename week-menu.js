@@ -42,13 +42,15 @@
     },
     // "13-08" (dia-mês) -> "13/08"
     date: {
-      match: /^\d{1,2}-\d{1,2}$/,
+      match: /^\d{4}-\d{2}-\d{2}-Aula\d{2}$/,
       label: function (name) {
-        return name.split('-').join('/');
+        var parts = name.split('-'); // [ano, mes, dia, "AulaNN"]
+        var aula = parts[3].replace('Aula', ''); // "01"
+        return 'Aula ' + aula + ': ' + parts[2] + '/' + parts[1];
       },
       sortKey: function (name) {
-        var parts = name.split('-').map(Number); // [dia, mes]
-        return parts[1] * 100 + parts[0]; // ordena por mês, depois dia
+        var parts = name.split('-'); // [ano, mes, dia, "AulaNN"]
+        return Number(parts[0]) * 10000 + Number(parts[1]) * 100 + Number(parts[2]); // ordena por ano, mês, dia
       }
     }
   };
