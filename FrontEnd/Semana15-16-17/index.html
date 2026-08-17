@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Perguntas Respondidas — Aulas 15, 16 e 17</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #191b22;
+    --bg-elev: #21242e;
+    --bg-elev-2: #262a36;
+    --line: #343947;
+    --text: #e7e6e2;
+    --text-dim: #9498a6;
+    --text-faint: #5c6070;
+
+    --c15: #5ec8c0;
+    --c15-soft: rgba(94,200,192,.12);
+    --c16: #f2789f;
+    --c16-soft: rgba(242,120,159,.12);
+    --c17: #e8b04b;
+    --c17-soft: rgba(232,176,75,.12);
+  }
+
+  *{ box-sizing: border-box; }
+  html{ scroll-behavior: smooth; }
+
+  body{
+    margin: 0;
+    background: var(--bg);
+    background-image:
+      radial-gradient(circle at 12% 8%, rgba(94,200,192,.05), transparent 40%),
+      radial-gradient(circle at 90% 85%, rgba(242,120,159,.05), transparent 40%);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    min-height: 100vh;
+    padding: clamp(16px, 4vw, 48px);
+  }
+
+  .window{
+    max-width: 880px;
+    margin: 0 auto;
+    background: var(--bg-elev);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 30px 60px -20px rgba(0,0,0,.5);
+  }
+
+  /* Title bar mimicking an editor chrome */
+  .titlebar{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 13px 18px;
+    background: var(--bg-elev-2);
+    border-bottom: 1px solid var(--line);
+  }
+  .dots{ display:flex; gap: 7px; }
+  .dot{ width: 11px; height: 11px; border-radius: 50%; }
+  .dot.r{ background: #ff5f57; }
+  .dot.y{ background: #febc2e; }
+  .dot.g{ background: #28c840; }
+  .filepath{
+    margin-left: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    color: var(--text-faint);
+    letter-spacing: .2px;
+  }
+  .filepath b{ color: var(--text-dim); font-weight: 500; }
+
+  header.hero{
+    padding: 34px 30px 22px;
+    border-bottom: 1px solid var(--line);
+  }
+  .eyebrow{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text-faint);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin: 0 0 10px;
+  }
+  h1{
+    margin: 0 0 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: clamp(22px, 4vw, 28px);
+    font-weight: 600;
+    letter-spacing: -.2px;
+    line-height: 1.3;
+  }
+  h1 .punct{ color: var(--text-faint); }
+  .hero p{
+    margin: 0;
+    color: var(--text-dim);
+    font-size: 14.5px;
+    line-height: 1.6;
+    max-width: 56ch;
+  }
+
+  /* Tabs styled like open editor tabs */
+  .tabs{
+    display: flex;
+    background: var(--bg-elev-2);
+    border-bottom: 1px solid var(--line);
+    overflow-x: auto;
+  }
+  .tab{
+    appearance: none;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 13px 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13.5px;
+    color: var(--text-faint);
+    border-right: 1px solid var(--line);
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: color .15s ease, background .15s ease, border-color .15s ease;
+  }
+  .tab .tab-dot{ width: 7px; height: 7px; border-radius: 50%; background: currentColor; opacity: .5; }
+  .tab:hover{ color: var(--text-dim); background: rgba(255,255,255,.02); }
+  .tab[aria-selected="true"]{ color: var(--text); background: var(--bg-elev); }
+  .tab[aria-selected="true"] .tab-dot{ opacity: 1; }
+  .tab[data-aula="15"][aria-selected="true"]{ border-bottom-color: var(--c15); }
+  .tab[data-aula="16"][aria-selected="true"]{ border-bottom-color: var(--c16); }
+  .tab[data-aula="17"][aria-selected="true"]{ border-bottom-color: var(--c17); }
+  .tab[data-aula="15"] .tab-dot{ color: var(--c15); }
+  .tab[data-aula="16"] .tab-dot{ color: var(--c16); }
+  .tab[data-aula="17"] .tab-dot{ color: var(--c17); }
+
+  main{ padding: 28px 30px 36px; }
+
+  .panel{ display: none; animation: fade .25s ease; }
+  .panel.active{ display: block; }
+  @media (prefers-reduced-motion: no-preference){
+    @keyframes fade{ from{ opacity: 0; transform: translateY(4px);} to{ opacity: 1; transform: translateY(0);} }
+  }
+
+  .panel-head{
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 22px;
+    padding-bottom: 18px;
+    border-bottom: 1px dashed var(--line);
+  }
+  .panel-head h2{
+    margin: 0 0 4px;
+    font-size: 18.5px;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+  }
+  .panel-head .subject{ margin:0; font-size: 13.5px; color: var(--text-dim); }
+
+  .download-btn{
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    font-weight: 500;
+    text-decoration: none;
+    padding: 10px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    color: var(--text);
+    background: var(--bg-elev-2);
+    transition: transform .12s ease, border-color .15s ease, background .15s ease;
+    white-space: nowrap;
+  }
+  .download-btn svg{ width: 14px; height: 14px; flex-shrink: 0; }
+  .download-btn:hover{ transform: translateY(-1px); }
+  .download-btn:focus-visible{ outline: 2px solid var(--text); outline-offset: 2px; }
+
+  .panel[data-aula="15"] .download-btn:hover{ border-color: var(--c15); color: var(--c15); }
+  .panel[data-aula="16"] .download-btn:hover{ border-color: var(--c16); color: var(--c16); }
+  .panel[data-aula="17"] .download-btn:hover{ border-color: var(--c17); color: var(--c17); }
+
+  .qa{
+    display: grid;
+    grid-template-columns: 34px 1fr;
+    gap: 0 16px;
+    margin-bottom: 26px;
+  }
+  .qa:last-child{ margin-bottom: 4px; }
+  .line-no{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text-faint);
+    padding-top: 3px;
+    text-align: right;
+  }
+  .qa .q{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14.5px;
+    font-weight: 600;
+    line-height: 1.5;
+    margin: 0 0 10px;
+  }
+  .panel[data-aula="15"] .q{ color: var(--c15); }
+  .panel[data-aula="16"] .q{ color: var(--c16); }
+  .panel[data-aula="17"] .q{ color: var(--c17); }
+
+  .qa .a{
+    margin: 0;
+    padding: 14px 16px;
+    background: var(--bg-elev-2);
+    border-left: 2px solid var(--line);
+    border-radius: 0 8px 8px 0;
+    font-size: 14.5px;
+    line-height: 1.7;
+    color: var(--text);
+  }
+  .qa .a p{ margin: 0 0 10px; }
+  .qa .a p:last-child{ margin-bottom: 0; }
+  .qa .a code{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    background: rgba(255,255,255,.06);
+    padding: 1px 6px;
+    border-radius: 4px;
+  }
+  .panel[data-aula="15"] .qa .a{ border-left-color: var(--c15); }
+  .panel[data-aula="16"] .qa .a{ border-left-color: var(--c16); }
+  .panel[data-aula="17"] .qa .a{ border-left-color: var(--c17); }
+
+  footer{
+    padding: 16px 30px 26px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11.5px;
+    color: var(--text-faint);
+    border-top: 1px solid var(--line);
+  }
+
+  @media (max-width: 520px){
+    .qa{ grid-template-columns: 22px 1fr; gap: 0 10px; }
+    .panel-head{ flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<div class="window">
+  <div class="titlebar">
+    <div class="dots"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span></div>
+    <span class="filepath">turma · <b>desenvolvimento-de-sistemas</b> / revisao.md</span>
+  </div>
+
+  <header class="hero">
+    <p class="eyebrow">Material de apoio — respostas comentadas</p>
+    <h1>Perguntas respondidas<span class="punct">;</span></h1>
+    <p>Explicações das perguntas de fixação das aulas 15, 16 e 17. Use as abas abaixo para navegar entre os temas e baixe o documento de cada aula para entrega.</p>
+  </header>
+
+  <div class="tabs" role="tablist" aria-label="Aulas">
+    <button class="tab" data-aula="15" role="tab" aria-selected="true" id="tabbtn-15" aria-controls="panel-15">
+      <span class="tab-dot"></span> aula15.js
+    </button>
+    <button class="tab" data-aula="16" role="tab" aria-selected="false" id="tabbtn-16" aria-controls="panel-16">
+      <span class="tab-dot"></span> aula16.js
+    </button>
+    <button class="tab" data-aula="17" role="tab" aria-selected="false" id="tabbtn-17" aria-controls="panel-17">
+      <span class="tab-dot"></span> aula17.js
+    </button>
+  </div>
+
+  <main>
+
+    <!-- AULA 15 -->
+    <section class="panel active" data-aula="15" id="panel-15" role="tabpanel" aria-labelledby="tabbtn-15">
+      <div class="panel-head">
+        <div>
+          <h2>Aula 15</h2>
+          <p class="subject">Prettier, ESLint e Babel</p>
+        </div>
+        <a class="download-btn" href="Semana15.docx" download>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Baixar aula15.docx
+        </a>
+      </div>
+
+      <div class="qa">
+        <span class="line-no">01</span>
+        <div>
+          <p class="q">Como o Prettier e o ESLint contribuem para a consistência e a qualidade do código?</p>
+          <div class="a">
+            <p>Os dois cumprem papéis diferentes e complementares. O <code>Prettier</code> é um formatador: ele reescreve automaticamente indentação, aspas, ponto e vírgula e quebras de linha seguindo um padrão único, então dois desenvolvedores diferentes produzem código visualmente idêntico, o que elimina discussões de estilo em revisão de código.</p>
+            <p>O <code>ESLint</code> é um analisador estático (linter): ele lê o código sem executá-lo e aponta problemas reais, como variáveis não usadas, comparações perigosas, importações quebradas ou más práticas da equipe. Enquanto o Prettier cuida da forma, o ESLint cuida do conteúdo. Usados juntos, reduzem bugs antes mesmo de rodar o programa e mantêm uma base de código consistente entre todos os membros de um time.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="qa">
+        <span class="line-no">02</span>
+        <div>
+          <p class="q">Por que Babel é importante ao desenvolver para diferentes navegadores?</p>
+          <div class="a">
+            <p>Navegadores mais antigos não entendem todos os recursos do JavaScript moderno (ES6+), como arrow functions, <code>let</code>/<code>const</code>, classes ou desestruturação. O Babel transpila esse código moderno, convertendo-o para uma versão equivalente em uma sintaxe mais antiga (geralmente próxima do ES5), que praticamente qualquer navegador consegue interpretar.</p>
+            <p>Isso permite que a equipe escreva com a sintaxe mais atual e produtiva, sem abrir mão de compatibilidade com navegadores e dispositivos mais antigos que os usuários da aplicação ainda possam usar.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="qa">
+        <span class="line-no">03</span>
+        <div>
+          <p class="q">O que você observou de diferenças entre o código original e o código transpilado por Babel?</p>
+          <div class="a">
+            <p>Ao comparar os dois arquivos, normalmente aparecem trocas como: <code>let</code>/<code>const</code> viram <code>var</code>; arrow functions viram <code>function</code> tradicionais; template literals (com crase) viram concatenação de strings com <code>+</code>; desestruturação é expandida em atribuições separadas; e classes ES6 são convertidas em funções construtoras com métodos no <code>prototype</code>.</p>
+            <p>O comportamento final é o mesmo, mas o código transpilado costuma ficar mais longo e menos legível — é o preço da compatibilidade com navegadores mais antigos.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- AULA 16 -->
+    <section class="panel" data-aula="16" id="panel-16" role="tabpanel" aria-labelledby="tabbtn-16">
+      <div class="panel-head">
+        <div>
+          <h2>Aula 16</h2>
+          <p class="subject">Animações em páginas web</p>
+        </div>
+        <a class="download-btn" href="Semana16.docx" download>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Baixar aula16.docx
+        </a>
+      </div>
+
+      <div class="qa">
+        <span class="line-no">01</span>
+        <div>
+          <p class="q">Como a adição de animações melhora a experiência de usuário em uma página web?</p>
+          <div class="a">
+            <p>Animações dão feedback visual imediato sobre o que está acontecendo: um botão que reage ao clique, um menu que desliza para abrir, um item que se destaca ao passar o mouse. Isso ajuda o usuário a entender o que é interativo e o que mudou de estado na tela.</p>
+            <p>Elas também tornam as transições entre estados menos abruptas — em vez de um elemento simplesmente sumir e outro aparecer, uma transição suave guia o olhar do usuário e evita que ele se perca no contexto. No conjunto, isso aumenta a percepção de qualidade e profissionalismo da interface.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="qa">
+        <span class="line-no">02</span>
+        <div>
+          <p class="q">O que pode acontecer com o desempenho da página ao se adicionar várias animações? Quais práticas você aplicaria para minimizar o impacto?</p>
+          <div class="a">
+            <p>Muitas animações rodando ao mesmo tempo podem sobrecarregar a renderização, causando quedas de quadros por segundo (<code>jank</code>), travamentos visuais e maior consumo de bateria e CPU, especialmente em celulares mais simples.</p>
+            <p>Para minimizar o impacto: priorizar animações em propriedades leves para o navegador, como <code>transform</code> e <code>opacity</code>, em vez de propriedades que forçam recálculo de layout, como <code>width</code>, <code>top</code> ou <code>left</code>; evitar animar muitos elementos ao mesmo tempo; usar <code>will-change</code> com moderação; e respeitar a preferência do usuário por menos movimento com a media query <code>prefers-reduced-motion</code>.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="qa">
+        <span class="line-no">03</span>
+        <div>
+          <p class="q">Qual é a diferença prática entre usar animações CSS e JavaScript? Em que situações você escolheria uma abordagem em vez da outra?</p>
+          <div class="a">
+            <p>Animações em CSS (<code>transition</code> e <code>@keyframes</code>) são declarativas: o navegador cuida da execução, geralmente de forma mais performática, e o código é simples de escrever e manter. Em troca, o controle é limitado — não é fácil pausar, reverter ou reagir a lógica complexa em tempo real.</p>
+            <p>Animações em JavaScript (Web Animations API ou bibliotecas) dão controle total: dá para iniciar, pausar, reverter, encadear ou basear a animação em dados dinâmicos e eventos do usuário. Em geral, CSS é a escolha para animações simples e previsíveis, como estados de hover e transições de interface; JavaScript entra quando a animação depende de interação complexa ou de dados que mudam em tempo de execução.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- AULA 17 -->
+    <section class="panel" data-aula="17" id="panel-17" role="tabpanel" aria-labelledby="tabbtn-17">
+      <div class="panel-head">
+        <div>
+          <h2>Aula 17</h2>
+          <p class="subject">fetch, axios e consumo de APIs</p>
+        </div>
+        <a class="download-btn" href="Semana17.docx" download>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Baixar aula17.docx
+        </a>
+      </div>
+
+      <div class="qa">
+        <span class="line-no">01</span>
+        <div>
+          <p class="q">Qual é a diferença entre fetch e axios para realizar requisições HTTP em JavaScript?</p>
+          <div class="a">
+            <p><code>fetch</code> é uma API nativa do navegador — não precisa instalar nada — mas exige mais código manual: é preciso chamar <code>.json()</code> para converter a resposta, e ela só rejeita a Promise em falha de rede, não quando o servidor responde com erro (como 404 ou 500).</p>
+            <p><code>axios</code> é uma biblioteca externa (instalada via npm) que já converte a resposta em JSON automaticamente, rejeita a Promise sozinha em respostas de erro, permite configurar timeout, cancelar requisições e usar interceptors para tratar toda requisição de forma centralizada. Em resumo: fetch é mais simples de disponibilizar, axios é mais completo e conveniente para projetos maiores.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="qa">
+        <span class="line-no">02</span>
+        <div>
+          <p class="q">Por que é importante tratar erros ao realizar requisições para uma API? Como isso pode ser feito no código?</p>
+          <div class="a">
+            <p>Uma requisição pode falhar por vários motivos fora do controle do código: conexão instável, servidor fora do ar, chave de API inválida ou limite de uso excedido. Sem tratamento de erro, a aplicação pode travar, exibir tela em branco ou mostrar dados incorretos para o usuário, sem explicação do que houve.</p>
+            <p>No código, isso é feito com <code>try/catch</code> ao usar <code>async/await</code> (ou <code>.catch()</code> com Promises), verificando também se <code>response.ok</code> é verdadeiro antes de processar os dados no caso do fetch. É boa prática exibir uma mensagem clara ao usuário e registrar o erro para facilitar a depuração.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="qa">
+        <span class="line-no">03</span>
+        <div>
+          <p class="q">O que significa o parâmetro units=metric na URL da API OpenWeatherMap e qual é a sua importância?</p>
+          <div class="a">
+            <p>Esse parâmetro define o sistema de unidades da resposta da API. Por padrão, a OpenWeatherMap retorna a temperatura em Kelvin; com <code>units=metric</code>, ela passa a retornar em graus Celsius e a velocidade do vento em metros por segundo, unidades usadas no Brasil.</p>
+            <p>A importância prática é evitar conversões manuais no código e reduzir o risco de exibir dados em uma unidade que o usuário não reconhece — sem esse parâmetro, seria necessário converter Kelvin para Celsius manualmente antes de mostrar a temperatura na tela.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>revisao.md — 3 aulas · 9 perguntas</footer>
+</div>
+
+<script>
+  const tabs = document.querySelectorAll('.tab');
+  const panels = document.querySelectorAll('.panel');
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const aula = tab.dataset.aula;
+
+      tabs.forEach(t => t.setAttribute('aria-selected', String(t === tab)));
+      panels.forEach(p => p.classList.toggle('active', p.dataset.aula === aula));
+    });
+  });
+</script>
+
+</body>
+</html>
