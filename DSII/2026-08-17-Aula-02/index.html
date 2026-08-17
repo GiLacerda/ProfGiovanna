@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reutilização de Código e Refatoração</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        main {
+            padding: 40px;
+        }
+
+        section {
+            margin-bottom: 40px;
+            padding: 30px;
+            background: #f8f9fa;
+            border-left: 5px solid #667eea;
+            border-radius: 5px;
+        }
+
+        section h2 {
+            color: #667eea;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .icon {
+            font-size: 1.5em;
+        }
+
+        section h3 {
+            color: #764ba2;
+            font-size: 1.3em;
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+
+        section h4 {
+            color: #555;
+            font-size: 1.1em;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        .exemplo {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .exemplo-titulo {
+            background: #e8eaf6;
+            padding: 15px;
+            font-weight: bold;
+            color: #667eea;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .codigo {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+            white-space: pre;
+        }
+
+        .resultado {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .comentario {
+            color: #6a737d;
+            font-style: italic;
+        }
+
+        .destaque {
+            background: #fff3cd;
+            padding: 15px;
+            border-left: 4px solid #ffc107;
+            margin: 15px 0;
+            border-radius: 3px;
+        }
+
+        .bom {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 3px;
+        }
+
+        .ruim {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 3px;
+        }
+
+        .lista-pontos {
+            list-style: none;
+            padding: 0;
+        }
+
+        .lista-pontos li {
+            padding: 10px 0;
+            padding-left: 30px;
+            position: relative;
+        }
+
+        .lista-pontos li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #28a745;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background: #667eea;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        .comparacao {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .comparacao > div {
+            padding: 15px;
+            border-radius: 5px;
+        }
+
+        .comparacao-bom {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+        }
+
+        .comparacao-ruim {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+        }
+
+        .comparacao h4 {
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .princípios {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .princípio-card {
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            border: 2px solid #667eea;
+        }
+
+        .princípio-card h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            color: #666;
+            border-top: 1px solid #ddd;
+        }
+
+        .tip {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 3px;
+        }
+
+        .resumo-box {
+            background: #f0f4ff;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+
+        .resumo-box li {
+            margin: 10px 0;
+            margin-left: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .comparacao, .princípios {
+                grid-template-columns: 1fr;
+            }
+
+            header h1 {
+                font-size: 1.8em;
+            }
+
+            main {
+                padding: 20px;
+            }
+
+            section {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎓 Reutilização de Código e Refatoração</h1>
+            <p>Escreva menos, aproveite mais, melhore sempre</p>
+        </header>
+
+        <main>
+            <!-- INTRODUÇÃO -->
+            <section>
+                <h2><span class="icon">🚀</span> Por Que Esses Conceitos Importam?</h2>
+
+                <p>Reutilizar código e refatorar são duas faces da mesma moeda: evitar retrabalho e manter o código saudável ao longo do tempo.</p>
+                <ul class="lista-pontos">
+                    <li>Reduzir código duplicado e o risco de bugs inconsistentes</li>
+                    <li>Acelerar o desenvolvimento de novas funcionalidades</li>
+                    <li>Manter o sistema fácil de entender e modificar</li>
+                    <li>Diminuir o custo de manutenção a longo prazo</li>
+                    <li>Preparar o código para crescer sem quebrar</li>
+                </ul>
+
+                <div class="destaque">
+                    <strong>💡 Lembre-se:</strong> Reutilização evita que você escreva a mesma lógica duas vezes. Refatoração garante que o código continue bom depois que ele já existe.
+                </div>
+            </section>
+
+            <!-- 1. REUTILIZAÇÃO DE CÓDIGO -->
+            <section>
+                <h2><span class="icon">♻️</span> 1. Reutilização de Código</h2>
+
+                <p>Reutilização é a prática de usar um mesmo trecho de lógica em diferentes partes do sistema, em vez de reescrevê-lo repetidamente.</p>
+
+                <h3>Princípio DRY</h3>
+                <div class="destaque">
+                    <strong>💡 DRY — Don't Repeat Yourself:</strong> toda regra de negócio deve existir em um único lugar no código. Se você precisa mudar algo em dois lugares diferentes para corrigir um único problema, há duplicação a resolver.
+                </div>
+
+                <h3>1.1 Extraindo Lógica Repetida em Métodos</h3>
+
+                <div class="comparacao">
+                    <div class="comparacao-ruim">
+                        <h4>❌ Código Duplicado</h4>
+                        <div class="codigo">public double calcularAreaCirculo1(double raio) {
+    return 3.14159 * raio * raio;
+}
+
+public double calcularAreaCilindro(double raio, double altura) {
+    double area = 3.14159 * raio * raio;
+    return area * altura;
+}</div>
+                    </div>
+                    <div class="comparacao-bom">
+                        <h4>✅ Lógica Reutilizada</h4>
+                        <div class="codigo">public double calcularAreaCirculo(double raio) {
+    return Math.PI * raio * raio;
+}
+
+public double calcularVolumeCilindro(double raio, double altura) {
+    double areaBase = calcularAreaCirculo(raio);
+    return areaBase * altura;
+}</div>
+                    </div>
+                </div>
+
+                <h3>1.2 Reutilização com Herança</h3>
+
+                <div class="exemplo">
+                    <div class="exemplo-titulo">Compartilhando atributos e comportamentos comuns</div>
+                    <div class="codigo">// Classe base concentra o que é comum
+public class Funcionario {
+    protected String nome;
+    protected double salarioBase;
+
+    public Funcionario(String nome, double salarioBase) {
+        this.nome = nome;
+        this.salarioBase = salarioBase;
+    }
+
+    public double calcularSalario() {
+        return salarioBase;
+    }
+}
+
+// Gerente reutiliza nome, salarioBase e o construtor de Funcionario
+public class Gerente extends Funcionario {
+    private double bonus;
+
+    public Gerente(String nome, double salarioBase, double bonus) {
+        super(nome, salarioBase);
+        this.bonus = bonus;
+    }
+
+    @Override
+    public double calcularSalario() {
+        return salarioBase + bonus;
+    }
+}</div>
+                </div>
+
+                <h3>1.3 Reutilização com Interfaces</h3>
+
+                <div class="exemplo">
+                    <div class="exemplo-titulo">Contrato comum entre classes sem parentesco</div>
+                    <div class="codigo">public interface Pagavel {
+    double calcularPagamento();
+}
+
+public class Funcionario implements Pagavel {
+    private double salarioBase;
+
+    public double calcularPagamento() {
+        return salarioBase;
+    }
+}
+
+public class Fornecedor implements Pagavel {
+    private double valorContrato;
+
+    public double calcularPagamento() {
+        return valorContrato;
+    }
+}
+
+// O sistema de folha de pagamento reutiliza a mesma lógica
+// para qualquer classe que implemente Pagavel
+public double calcularTotalAPagar(List<Pagavel> itens) {
+    double total = 0;
+    for (Pagavel item : itens) {
+        total += item.calcularPagamento();
+    }
+    return total;
+}</div>
+                </div>
+
+                <h3>1.4 Herança vs. Composição</h3>
+
+                <p>Herança representa uma relação <strong>"é um"</strong>. Quando essa relação não é natural, composição — uma relação <strong>"tem um"</strong> — costuma ser a escolha mais flexível.</p>
+
+                <div class="comparacao">
+                    <div class="comparacao-ruim">
+                        <h4>❌ Herança Forçada</h4>
+                        <div class="codigo">// Um carro elétrico "é um" carro, ok.
+public class Carro {
+    public void ligarMotorCombustao() { ... }
+}
+
+// Mas carro elétrico não tem motor a combustão!
+// Herdar aqui obriga a herdar comportamento errado
+public class CarroEletrico extends Carro {
+    // precisa sobrescrever/ignorar o que não serve
+}</div>
+                    </div>
+                    <div class="comparacao-bom">
+                        <h4>✅ Composição</h4>
+                        <div class="codigo">public interface Motor {
+    void ligar();
+}
+
+public class MotorEletrico implements Motor {
+    public void ligar() { /* liga o motor elétrico */ }
+}
+
+public class Carro {
+    private Motor motor;
+
+    public Carro(Motor motor) {
+        this.motor = motor;
+    }
+
+    public void ligar() {
+        motor.ligar();
+    }
+}</div>
+                    </div>
+                </div>
+
+                <h3>1.5 Formas de Reutilização</h3>
+
+                <table>
+                    <tr>
+                        <th>Técnica</th>
+                        <th>Quando usar</th>
+                        <th>Exemplo</th>
+                    </tr>
+                    <tr>
+                        <td>Métodos</td>
+                        <td>Mesma lógica usada em vários pontos</td>
+                        <td><code>calcularAreaCirculo()</code></td>
+                    </tr>
+                    <tr>
+                        <td>Herança</td>
+                        <td>Relação "é um" entre classes</td>
+                        <td><code>Gerente extends Funcionario</code></td>
+                    </tr>
+                    <tr>
+                        <td>Interfaces</td>
+                        <td>Contrato comum entre classes não relacionadas</td>
+                        <td><code>Pagavel</code></td>
+                    </tr>
+                    <tr>
+                        <td>Composição</td>
+                        <td>Relação "tem um", comportamento trocável</td>
+                        <td><code>Carro</code> tem um <code>Motor</code></td>
+                    </tr>
+                    <tr>
+                        <td>Bibliotecas/Pacotes</td>
+                        <td>Código reutilizável entre projetos</td>
+                        <td>Apache Commons, Guava</td>
+                    </tr>
+                </table>
+
+                <div class="tip">
+                    <strong>💡 Dica:</strong> "Prefira composição a herança" é uma regra clássica — herança acopla fortemente as classes, enquanto composição permite trocar comportamentos com mais liberdade.
+                </div>
+            </section>
+
+            <!-- 2. REFATORAÇÃO -->
+            <section>
+                <h2><span class="icon">🔧</span> 2. Refatoração</h2>
+
+                <p>Refatorar é reorganizar a estrutura interna do código <strong>sem alterar seu comportamento externo</strong>, tornando-o mais limpo, legível e fácil de manter.</p>
+
+                <div class="destaque">
+                    <strong>⚠️ Regra de Ouro:</strong> Refatoração muda a forma como o código é escrito, nunca o que ele produz como resultado. Por isso, ter testes antes de refatorar é essencial.
+                </div>
+
+                <h3>2.1 Quando Refatorar? — Sinais de Alerta ("Code Smells")</h3>
+
+                <table>
+                    <tr>
+                        <th>Sinal</th>
+                        <th>Descrição</th>
+                    </tr>
+                    <tr>
+                        <td>Código duplicado</td>
+                        <td>O mesmo trecho de lógica aparece em vários lugares</td>
+                    </tr>
+                    <tr>
+                        <td>Método longo</td>
+                        <td>Uma função faz muitas coisas ao mesmo tempo</td>
+                    </tr>
+                    <tr>
+                        <td>Classe inchada</td>
+                        <td>Uma classe concentra responsabilidades demais</td>
+                    </tr>
+                    <tr>
+                        <td>Muitos parâmetros</td>
+                        <td>Métodos com listas enormes de argumentos</td>
+                    </tr>
+                    <tr>
+                        <td>Nomes ruins</td>
+                        <td>Variáveis e métodos que não explicam seu propósito</td>
+                    </tr>
+                    <tr>
+                        <td>Condicionais aninhados</td>
+                        <td>Vários "ifs" um dentro do outro, difíceis de seguir</td>
+                    </tr>
+                </table>
+
+                <h3>2.2 Técnica: Extract Method (Extrair Método)</h3>
+
+                <div class="comparacao">
+                    <div class="comparacao-ruim">
+                        <h4>❌ Antes</h4>
+                        <div class="codigo">public void imprimirFatura(Pedido pedido) {
+    double total = 0;
+    for (Item item : pedido.getItens()) {
+        total += item.getPreco() * item.getQuantidade();
+    }
+
+    System.out.println("=== FATURA ===");
+    System.out.println("Cliente: " + pedido.getCliente());
+    System.out.println("Total: R$ " + total);
+}</div>
+                    </div>
+                    <div class="comparacao-bom">
+                        <h4>✅ Depois</h4>
+                        <div class="codigo">public void imprimirFatura(Pedido pedido) {
+    double total = calcularTotal(pedido);
+    imprimirCabecalho(pedido, total);
+}
+
+private double calcularTotal(Pedido pedido) {
+    double total = 0;
+    for (Item item : pedido.getItens()) {
+        total += item.getPreco() * item.getQuantidade();
+    }
+    return total;
+}
+
+private void imprimirCabecalho(Pedido pedido, double total) {
+    System.out.println("=== FATURA ===");
+    System.out.println("Cliente: " + pedido.getCliente());
+    System.out.println("Total: R$ " + total);
+}</div>
+                    </div>
+                </div>
+
+                <h3>2.3 Técnica: Renomear para Clareza</h3>
+
+                <div class="comparacao">
+                    <div class="comparacao-ruim">
+                        <h4>❌ Antes</h4>
+                        <div class="codigo">public double calc(int a, int b) {
+    return a * b * 0.1;
+}</div>
+                    </div>
+                    <div class="comparacao-bom">
+                        <h4>✅ Depois</h4>
+                        <div class="codigo">private static final double TAXA_COMISSAO = 0.1;
+
+public double calcularComissao(int quantidadeVendida, double precoUnitario) {
+    return quantidadeVendida * precoUnitario * TAXA_COMISSAO;
+}</div>
+                    </div>
+                </div>
+
+                <h3>2.4 Técnica: Extract Class (Dividir Responsabilidades)</h3>
+
+                <div class="exemplo">
+                    <div class="exemplo-titulo">❌ Uma classe fazendo tudo</div>
+                    <div class="codigo">public class Usuario {
+    private String nome;
+    private String email;
+
+    public boolean validarEmail() { /* ... */ return true; }
+    public void enviarEmailBoasVindas() { /* ... */ }
+    public void salvarNoBanco() { /* ... */ }
+    public String gerarRelatorioPDF() { /* ... */ return ""; }
+}</div>
+                </div>
+
+                <div class="exemplo">
+                    <div class="exemplo-titulo">✅ Responsabilidades separadas</div>
+                    <div class="codigo">public class Usuario {
+    private String nome;
+    private String email;
+    // apenas dados e regras do próprio usuário
+}
+
+public class ValidadorEmail {
+    public boolean validar(String email) { /* ... */ return true; }
+}
+
+public class EmailService {
+    public void enviarBoasVindas(Usuario usuario) { /* ... */ }
+}
+
+public class UsuarioRepository {
+    public void salvar(Usuario usuario) { /* ... */ }
+}</div>
+                </div>
+
+                <h3>2.5 Técnica: Substituir Números Mágicos por Constantes</h3>
+
+                <div class="comparacao">
+                    <div class="comparacao-ruim">
+                        <h4>❌ Antes</h4>
+                        <div class="codigo">if (idade >= 18) {
+    liberarAcesso();
+}
+
+double desconto = preco * 0.05;</div>
+                    </div>
+                    <div class="comparacao-bom">
+                        <h4>✅ Depois</h4>
+                        <div class="codigo">private static final int IDADE_MINIMA = 18;
+private static final double TAXA_DESCONTO = 0.05;
+
+if (idade >= IDADE_MINIMA) {
+    liberarAcesso();
+}
+
+double desconto = preco * TAXA_DESCONTO;</div>
+                    </div>
+                </div>
+
+                <h3>2.6 Técnica: Simplificar Condicionais</h3>
+
+                <div class="comparacao">
+                    <div class="comparacao-ruim">
+                        <h4>❌ Antes</h4>
+                        <div class="codigo">if (usuario.getIdade() >= 18) {
+    if (usuario.isAtivo()) {
+        if (usuario.getSaldo() > 0) {
+            permitirCompra();
+        }
+    }
+}</div>
+                    </div>
+                    <div class="comparacao-bom">
+                        <h4>✅ Depois</h4>
+                        <div class="codigo">boolean podeComprar = usuario.getIdade() >= 18
+        && usuario.isAtivo()
+        && usuario.getSaldo() > 0;
+
+if (podeComprar) {
+    permitirCompra();
+}</div>
+                    </div>
+                </div>
+
+                <h3>2.7 Regra dos Três</h3>
+
+                <div class="destaque">
+                    <strong>💡 Regra dos Três:</strong> na primeira vez, apenas escreva o código. Na segunda vez que precisar de algo parecido, copie e siga em frente. Na terceira vez, é hora de refatorar e extrair a lógica comum.
+                </div>
+            </section>
+
+            <!-- 3. CHECKLIST -->
+            <section>
+                <h2><span class="icon">✅</span> 3. Checklist Prático</h2>
+
+                <p>Antes de considerar o código pronto, verifique:</p>
+
+                <table>
+                    <tr>
+                        <th>Categoria</th>
+                        <th>Verificações</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Reutilização</strong></td>
+                        <td>
+                            ✓ Existe lógica repetida em mais de um lugar?<br>
+                            ✓ Essa lógica poderia virar um método?<br>
+                            ✓ Faz sentido usar herança, interface ou composição aqui?<br>
+                            ✓ Já existe uma biblioteca que resolve isso?
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Tamanho</strong></td>
+                        <td>
+                            ✓ Métodos com até 20-30 linhas?<br>
+                            ✓ Classes com uma responsabilidade clara?<br>
+                            ✓ Poucos parâmetros por método?
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Nomenclatura</strong></td>
+                        <td>
+                            ✓ Nomes explicam o propósito sem precisar de comentário?<br>
+                            ✓ Sem abreviações confusas?
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Segurança da Refatoração</strong></td>
+                        <td>
+                            ✓ Existem testes cobrindo o comportamento atual?<br>
+                            ✓ O comportamento externo continua o mesmo depois da mudança?<br>
+                            ✓ Cada refatoração foi feita em passos pequenos?
+                        </td>
+                    </tr>
+                </table>
+            </section>
+
+            <!-- 4. EXEMPLO COMPLETO -->
+            <section>
+                <h2><span class="icon">📚</span> 4. Exemplo Completo</h2>
+
+                <p>Veja como aplicar reutilização e refatoração juntas:</p>
+
+                <h3>Antes (Sem Boas Práticas)</h3>
+                <div class="exemplo">
+                    <div class="codigo">public class P {
+    public void proc(List<Map<String, Object>> l) {
+        double t = 0;
+        for (Map<String, Object> i : l) {
+            double p = (double) i.get("preco");
+            int q = (int) i.get("qtd");
+            if (q > 0) {
+                t = t + p * q;
+            }
+        }
+        if (t > 100) {
+            t = t - t * 0.1;
+        }
+        System.out.println("Total: " + t);
+        if (t > 500) {
+            System.out.println("Cliente VIP!");
+        }
+    }
+}</div>
+                </div>
+
+                <h3>Depois (Com Boas Práticas)</h3>
+                <div class="exemplo">
+                    <div class="codigo">// ==================== PROCESSAMENTO DE PEDIDOS ====================
+
+public class ProcessadorPedido {
+
+    private static final double LIMITE_DESCONTO = 100.0;
+    private static final double TAXA_DESCONTO = 0.1;
+    private static final double LIMITE_VIP = 500.0;
+
+    public void processarPedido(List<ItemPedido> itens) {
+        double total = calcularTotal(itens);
+        total = aplicarDesconto(total);
+
+        exibirResultado(total);
+    }
+
+    private double calcularTotal(List<ItemPedido> itens) {
+        double total = 0;
+
+        for (ItemPedido item : itens) {
+            if (item.getQuantidade() > 0) {
+                total += item.getPreco() * item.getQuantidade();
+            }
+        }
+
+        return total;
+    }
+
+    private double aplicarDesconto(double total) {
+        if (total > LIMITE_DESCONTO) {
+            return total - (total * TAXA_DESCONTO);
+        }
+        return total;
+    }
+
+    private void exibirResultado(double total) {
+        System.out.println("Total: R$ " + total);
+
+        if (total > LIMITE_VIP) {
+            System.out.println("Cliente VIP!");
+        }
+    }
+}</div>
+                </div>
+
+                <div class="bom">
+                    <strong>Melhorias Aplicadas:</strong>
+                    <ul style="margin-top: 10px;">
+                        <li>✓ Nomes descritivos (P → ProcessadorPedido, proc → processarPedido)</li>
+                        <li>✓ Tipos específicos em vez de <code>Map&lt;String, Object&gt;</code> (uso de <code>ItemPedido</code>)</li>
+                        <li>✓ Método dividido por responsabilidade (Extract Method)</li>
+                        <li>✓ Números mágicos substituídos por constantes nomeadas</li>
+                        <li>✓ Cada método faz apenas uma coisa</li>
+                        <li>✓ Comentário de seção organiza a leitura</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- 5. FERRAMENTAS -->
+            <section>
+                <h2><span class="icon">🛠️</span> 5. Ferramentas Recomendadas</h2>
+
+                <table>
+                    <tr>
+                        <th>Ferramenta</th>
+                        <th>Propósito</th>
+                        <th>Contexto</th>
+                    </tr>
+                    <tr>
+                        <td><strong>IntelliJ IDEA</strong></td>
+                        <td>Menu "Refactor" com Extract Method, Rename e mais</td>
+                        <td>Java</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Eclipse</strong></td>
+                        <td>Menu "Refactor" para renomear, extrair e mover código</td>
+                        <td>Java</td>
+                    </tr>
+                    <tr>
+                        <td><strong>SonarLint / SonarQube</strong></td>
+                        <td>Detecta duplicação de código e code smells</td>
+                        <td>Múltiplas linguagens</td>
+                    </tr>
+                    <tr>
+                        <td><strong>PMD / Checkstyle</strong></td>
+                        <td>Análise estática de código Java</td>
+                        <td>Java</td>
+                    </tr>
+                    <tr>
+                        <td><strong>JUnit</strong></td>
+                        <td>Garante que a refatoração não muda o comportamento</td>
+                        <td>Java</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Git</strong></td>
+                        <td>Versiona o código antes de refatorar, permitindo reverter</td>
+                        <td>Todos os projetos</td>
+                    </tr>
+                </table>
+
+                <div class="tip">
+                    <strong>💡 Dica:</strong> Sempre tenha testes (ou pelo menos um commit salvo) antes de refatorar. Assim, se algo sair errado, é fácil voltar atrás.
+                </div>
+            </section>
+
+            <!-- 6. REFERÊNCIA RÁPIDA -->
+            <section>
+                <h2><span class="icon">📋</span> 6. Referência Rápida</h2>
+
+                <div class="princípios">
+                    <div class="princípio-card">
+                        <h4>♻️ DRY</h4>
+                        <p>Não repita lógica. Cada regra deve existir em um único lugar.</p>
+                    </div>
+                    <div class="princípio-card">
+                        <h4>🧬 Herança</h4>
+                        <p>Use quando existe uma relação "é um" entre as classes.</p>
+                    </div>
+                    <div class="princípio-card">
+                        <h4>🧩 Composição</h4>
+                        <p>Use quando existe uma relação "tem um" e comportamento flexível.</p>
+                    </div>
+                    <div class="princípio-card">
+                        <h4>🔧 Refatoração</h4>
+                        <p>Mude a estrutura, nunca o comportamento. Sempre em passos pequenos.</p>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <footer>
+            <p>📚 Reutilização de Código e Refatoração | Boas Práticas de Programação</p>
+            <p style="margin-top: 10px; font-size: 0.9em;">💡 "Refatorar é como arrumar a casa: os móveis continuam com a mesma função, só o espaço fica mais organizado."</p>
+        </footer>
+    </div>
+</body>
+</html>
