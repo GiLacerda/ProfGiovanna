@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>S18 — Integração com Serviços de Terceiros | Material de Estudos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --accent: #52525b;
+      --accent-dark: #2f3033;
+      --dark: #1c1c1c;
+      --gray-900: #20232a;
+      --gray-700: #4a4f57;
+      --gray-500: #767c86;
+      --gray-200: #e7e9ec;
+      --gray-100: #f4f5f7;
+      --bg: #fafafa;
+      --card: #ffffff;
+      --green: #1e8e3e;
+      --amber: #b7791f;
+      --blue: #1a56db;
+      --red: #b3261e;
+      --code-bg: #282c34;
+      --code-text: #e6e6e6;
+      --radius: 14px;
+      --shadow: 0 2px 10px rgba(0, 0, 0, .06);
+      --shadow-lg: 0 14px 32px rgba(0, 0, 0, .10);
+    }
+
+    * { box-sizing: border-box }
+    html { scroll-behavior: smooth }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--dark);
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .topbar {
+      position: relative;
+      background: linear-gradient(120deg, var(--accent) 0%, var(--accent-dark) 100%);
+      color: #fff;
+      padding: 32px 6vw 30px;
+      overflow: hidden;
+    }
+
+    .topbar::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(circle at 88% 12%, rgba(255, 255, 255, .16) 0%, transparent 45%),
+        radial-gradient(circle at 100% 105%, rgba(255, 255, 255, .10) 0%, transparent 40%);
+      pointer-events: none;
+    }
+
+    .topbar-inner { position: relative; z-index: 1; }
+
+    .topbar-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .topbar .eyebrow {
+      font-size: .8rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      opacity: .85;
+      margin-bottom: 6px;
+    }
+
+    .topbar h1 { margin: 0 0 8px; font-size: 1.9rem; font-weight: 800; letter-spacing: -.01em; }
+    .topbar p { margin: 0; max-width: 760px; opacity: .95; font-size: .98rem; }
+
+    .badges { margin-top: 16px; display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .badge {
+      background: rgba(255, 255, 255, .18);
+      border: 1px solid rgba(255, 255, 255, .35);
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: .78rem;
+      transition: background .18s ease;
+    }
+    .badge:hover { background: rgba(255, 255, 255, .28); }
+
+    .btn-row { display: flex; gap: 10px; flex-wrap: wrap; }
+
+    .btn-download {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #fff;
+      color: var(--accent-dark);
+      font-weight: 700;
+      font-size: .84rem;
+      padding: 10px 16px;
+      border-radius: 10px;
+      text-decoration: none;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, .18);
+      transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+    .btn-download:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(0, 0, 0, .22); background: #f3f3f4; }
+    .btn-download:active { transform: translateY(0); }
+    .btn-download svg { width: 15px; height: 15px; flex-shrink: 0; }
+
+    nav.tabs {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: #fff;
+      border-bottom: 1px solid var(--gray-200);
+      display: flex;
+      gap: 2px;
+      overflow-x: auto;
+      padding: 0 6vw;
+      box-shadow: var(--shadow);
+    }
+
+    nav.tabs a {
+      white-space: nowrap;
+      padding: 14px 16px;
+      color: var(--gray-700);
+      text-decoration: none;
+      font-size: .88rem;
+      font-weight: 600;
+      border-bottom: 3px solid transparent;
+      transition: color .15s ease, border-color .15s ease;
+    }
+    nav.tabs a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+    main { max-width: 980px; margin: 0 auto; padding: 34px 6vw 90px; }
+
+    section { margin-bottom: 52px; scroll-margin-top: 64px; }
+
+    .section-head { display: flex; align-items: center; gap: 14px; margin-bottom: 6px; }
+
+    .section-num {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+      color: #fff;
+      font-weight: 800;
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+      box-shadow: 0 4px 10px rgba(47, 48, 51, .18);
+    }
+
+    h2 { font-size: 1.5rem; margin: 0; color: var(--gray-900); }
+    .section-sub { color: var(--gray-500); font-size: .92rem; margin: 4px 0 22px 52px; }
+    h3 { font-size: 1.15rem; color: var(--gray-900); margin: 28px 0 10px; border-left: 4px solid var(--accent); padding-left: 10px; }
+    h4 { font-size: 1rem; color: var(--gray-900); margin: 18px 0 8px; }
+    p { margin: 0 0 12px; }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 20px 22px;
+      box-shadow: var(--shadow);
+      margin-bottom: 16px;
+      transition: box-shadow .2s ease, transform .2s ease;
+    }
+    .card:hover { box-shadow: var(--shadow-lg); transform: translateY(-2px); }
+
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+
+    @media(max-width:720px) {
+      .grid2, .grid3 { grid-template-columns: 1fr; }
+      .section-sub { margin-left: 0; }
+    }
+
+    table { width: 100%; border-collapse: collapse; margin: 12px 0 20px; font-size: .9rem; }
+    th, td { text-align: left; padding: 10px 12px; border: 1px solid var(--gray-200); vertical-align: top; }
+    th { background: var(--gray-100); font-weight: 700; color: var(--gray-900); }
+    tr:nth-child(even) td { background: #fcfcfd; }
+    tbody tr:hover td { background: #f3f3f4; }
+    table { border-radius: 10px; overflow: hidden; }
+
+    .tag {
+      display: inline-block;
+      background: var(--gray-100);
+      border: 1px solid var(--gray-200);
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-size: .76rem;
+      font-weight: 600;
+      color: var(--gray-700);
+      margin: 2px 4px 2px 0;
+    }
+    .tag.rel { background: #eaf1ff; color: var(--blue); border-color: #cfe0ff; }
+    .tag.nosql { background: #eafaf0; color: var(--green); border-color: #cdefd9; }
+    .tag.warn { background: #fff3d6; color: var(--amber); border-color: #ffe2a8; }
+
+    code {
+      background: var(--gray-100);
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-family: 'Fira Code', Consolas, monospace;
+      font-size: .85em;
+      color: var(--accent-dark);
+    }
+
+    pre {
+      background: var(--code-bg);
+      color: var(--code-text);
+      padding: 16px 18px;
+      border-radius: 10px;
+      overflow-x: auto;
+      font-size: .83rem;
+      line-height: 1.5;
+      margin: 10px 0 18px;
+    }
+    pre code { background: none; color: inherit; padding: 0; }
+
+    .callout { border-radius: 10px; padding: 14px 18px; margin: 14px 0; font-size: .92rem; }
+    .callout.info { background: #eef4ff; border: 1px solid #cfe0ff; }
+    .callout.warn { background: #fff7e6; border: 1px solid #ffe2a8; }
+    .callout.ok { background: #eafaf0; border: 1px solid #cdefd9; }
+
+    .scenario {
+      background: var(--gray-100);
+      border-radius: 10px;
+      padding: 14px 18px;
+      font-size: .92rem;
+      margin-bottom: 14px;
+      border-left: 4px solid var(--gray-500);
+    }
+
+    .scenario b.title { display: block; color: var(--accent-dark); margin-bottom: 4px; }
+
+    ul, ol { margin: 0 0 14px; padding-left: 22px; }
+    li { margin-bottom: 6px; }
+
+    .timeline { display: flex; flex-direction: column; gap: 10px; margin: 16px 0; }
+    .timeline .step { display: flex; gap: 12px; align-items: flex-start; }
+    .step .dot {
+      width: 26px; height: 26px; flex-shrink: 0; border-radius: 50%;
+      background: var(--accent); color: #fff; font-size: .75rem; font-weight: 800;
+      display: flex; align-items: center; justify-content: center; margin-top: 2px;
+    }
+
+    footer { background: var(--gray-900); color: #cfd2d8; padding: 34px 6vw; font-size: .82rem; }
+    footer a { color: #9fc2ff; }
+    footer h4 { color: #fff; margin-top: 0; }
+
+    .toc-back {
+      position: fixed; bottom: 20px; right: 20px;
+      background: var(--accent); color: #fff; width: 44px; height: 44px;
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      text-decoration: none; box-shadow: 0 4px 12px rgba(0, 0, 0, .25); font-size: 1.1rem;
+      transition: transform .15s ease, background .15s ease;
+    }
+    .toc-back:hover { background: var(--accent-dark); transform: translateY(-3px); }
+
+    .objectives { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 18px 0 6px; }
+    @media(max-width:720px) { .objectives { grid-template-columns: 1fr; } }
+
+    .obj-card {
+      background: #fff; border: 1px solid var(--gray-200); border-radius: 10px;
+      padding: 14px 16px; font-size: .85rem;
+    }
+    .obj-card b { display: block; color: var(--accent-dark); margin-bottom: 4px; font-size: .78rem; text-transform: uppercase; letter-spacing: .04em; }
+
+    /* Perguntas de síntese */
+    .synth {
+      background: #fff;
+      border: 1px solid var(--gray-200);
+      border-left: 5px solid var(--accent-dark);
+      border-radius: 10px;
+      padding: 18px 22px;
+      margin: 0 0 16px;
+    }
+    .synth .synth-num {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--accent-dark); color: #fff; font-weight: 800; font-size: .85rem;
+      margin-right: 10px; flex-shrink: 0;
+    }
+    .synth-head { display: flex; align-items: center; margin-bottom: 8px; }
+    .synth-head b { font-size: 1rem; color: var(--gray-900); }
+    .synth ul { margin-top: 8px; }
+
+    .resources {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+    @media(max-width:720px) { .resources { grid-template-columns: 1fr; } }
+    .res-item {
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      background: var(--gray-100); border: 1px solid var(--gray-200); border-radius: 10px;
+      padding: 12px 14px; font-size: .88rem;
+    }
+    .res-item a {
+      color: var(--accent-dark); font-weight: 700; text-decoration: none;
+      background: #fff; border: 1px solid var(--gray-200); padding: 6px 12px; border-radius: 8px;
+      white-space: nowrap;
+    }
+    .res-item a:hover { background: var(--gray-100); }
+  </style>
+</head>
+
+<body>
+
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="topbar-top">
+        <div>
+          <div class="eyebrow">Técnico em Desenvolvimento de Sistemas · Armazenamento de Dados e Repositórios ·
+            Unidade 2</div>
+          <h1>Semana 18 — Integração com Serviços de Terceiros</h1>
+          <p>Material de estudos consolidado a partir das aulas 1 a 4: integração com APIs externas, BaaS
+            (Back-end como Serviço), serviços de mensageria e monitoramento/análise de logs. Conteúdo reorganizado e
+            sintetizado para que você consiga responder às atividades propostas.</p>
+        </div>
+      </div>
+      <div class="badges">
+        <span class="badge">Aula 1 · APIs externas</span>
+        <span class="badge">Aula 2 · BaaS</span>
+        <span class="badge">Aula 3 · Mensageria</span>
+        <span class="badge">Aula 4 · Monitoramento e logs</span>
+      </div>
+    </div>
+  </div>
+
+  <nav class="tabs">
+    <a href="#visao-geral">Visão geral</a>
+    <a href="#aula1">1. APIs externas</a>
+    <a href="#aula2">2. BaaS</a>
+    <a href="#aula3">3. Mensageria</a>
+    <a href="#aula4">4. Monitoramento</a>
+    <a href="./Semana18.docx" download>Perguntas de síntese</a>
+  </nav>
+
+  <main>
+
+    <section id="visao-geral">
+      <div class="section-head"><span class="section-num">•</span>
+        <h2>Visão geral da semana</h2>
+      </div>
+      <div class="section-sub">Como as quatro aulas se conectam</div>
+      <div class="card">
+        <p>A Semana 18 trata da <b>integração de aplicativos mobile com serviços externos</b>. As quatro aulas
+          formam uma progressão: primeiro aprendemos a consumir dados de <b>APIs externas</b> (Aula 1); em seguida
+          vemos como acelerar o desenvolvimento usando <b>Back-end como Serviço (BaaS)</b>, que já entrega
+          autenticação, banco de dados e notificações prontos (Aula 2); depois focamos em <b>comunicação em tempo
+            real</b> entre dispositivos e sistemas por meio de serviços de mensageria (Aula 3); e fechamos com
+          <b>monitoramento e análise de logs</b>, essenciais para identificar e corrigir falhas em todas as
+          integrações anteriores (Aula 4).</p>
+        <div class="objectives">
+          <div class="obj-card"><b>Aula 1</b>Integrar um app com API externas, tratando autenticação, formatos de
+            dados e erros.</div>
+          <div class="obj-card"><b>Aula 2</b>Utilizar serviços de back-end como serviço (BaaS) para acelerar o
+            desenvolvimento mobile.</div>
+          <div class="obj-card"><b>Aula 3</b>Configurar e integrar serviços de mensageria para comunicação em tempo
+            real.</div>
+          <div class="obj-card"><b>Aula 4</b>Configurar ferramentas de monitoramento e analisar logs para
+            identificar falhas.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== AULA 1 ===================== -->
+    <section id="aula1">
+      <div class="section-head"><span class="section-num">1</span>
+        <h2>Integração com APIs externas</h2>
+      </div>
+      <div class="section-sub">Aula 1 · [SIS]ANO2C1B3S18A1</div>
+
+      <div class="card">
+        <h3>Conceitos-chave</h3>
+        <p><b>API</b> (<i>Application Programming Interface</i>) é a interface que permite que uma aplicação mobile
+          se conecte a serviços externos para consumir e enviar dados — por exemplo, autenticação, recuperação de
+          informações ou armazenamento em nuvem.</p>
+
+        <h4>Autenticação de API</h4>
+        <p>A maioria das APIs exige autenticação para controlar quem pode fazer requisições:</p>
+        <table>
+          <tr><th>Tipo</th><th>Como funciona</th></tr>
+          <tr><td><b>Chave de API</b></td><td>Identificador único fornecido pelo serviço, enviado em cada
+            requisição para autenticar o app.</td></tr>
+          <tr><td><b>OAuth</b></td><td>Protocolo mais robusto, que permite acesso autorizado <i>em nome de um
+            usuário</i> (sem que o app precise conhecer a senha dele).</td></tr>
+        </table>
+
+        <h4>Consumo de dados</h4>
+        <p>Consiste em fazer requisições HTTP (<code>GET</code>, <code>POST</code> etc.) para <i>endpoints</i>
+          específicos da API. Os dados retornados geralmente vêm em <b>JSON</b> (JavaScript Object Notation) ou
+          <b>XML</b> — o formato de resposta influencia diretamente como o app vai tratar e exibir essa informação.</p>
+
+        <div class="callout info"><b>Por que isso importa:</b> antes de consumir uma API, é preciso saber <i>como</i>
+          ela autentica as requisições e <i>em que formato</i> ela devolve os dados — do contrário, o app não
+          consegue interpretar corretamente a resposta nem garantir que a chamada seja aceita pelo servidor.</div>
+      </div>
+
+      <div class="scenario">
+        <b class="title">Situação-problema — TravelWeather</b>
+        A empresa TravelWeather, especializada em viagens, deseja implementar um recurso no aplicativo mobile que
+        exibe previsões do tempo para os destinos escolhidos pelos usuários. Para isso, será necessário integrar uma
+        API de clima fictícia chamada <b>WeatherPlus</b>.
+      </div>
+
+      <div class="card">
+        <h3>Atividade prática — o que fazer</h3>
+        <ol>
+          <li>Pesquisem a documentação da API fictícia "WeatherPlus" e entendam como a autenticação e os
+            <i>endpoints</i> funcionariam.</li>
+          <li>Planejem como obter os dados da API, considerando: quais dados precisam ser solicitados (ex.:
+            temperatura, umidade) e qual formato de resposta será analisado (JSON ou XML).</li>
+          <li>Imaginem possíveis falhas na autenticação ou nos dados recebidos e pensem em como tratar esses
+            erros.</li>
+        </ol>
+        <div class="callout warn"><b>Dica para tratamento de erros:</b> pense em cenários como token expirado,
+          <i>endpoint</i> fora do ar, resposta em formato inesperado ou dados incompletos — e o que o app deveria
+          exibir ao usuário em cada caso, em vez de simplesmente travar.</div>
+      </div>
+    </section>
+
+    <!-- ===================== AULA 2 ===================== -->
+    <section id="aula2">
+      <div class="section-head"><span class="section-num">2</span>
+        <h2>Utilização de serviços de back-end como serviço (BaaS)</h2>
+      </div>
+      <div class="section-sub">Aula 2 · [SIS]ANO2C1B3S18A2</div>
+
+      <div class="card">
+        <h3>Conceitos-chave</h3>
+        <p><b>BaaS</b> (<i>Backend as a Service</i>) fornece funcionalidades de back-end — como armazenamento,
+          autenticação e notificações — em um modelo de serviço pronto para uso. Isso elimina a necessidade de
+          construir essa infraestrutura do zero, permitindo que a equipe se concentre na experiência do usuário.</p>
+
+        <table>
+          <tr><th>Serviço</th><th>O que oferece</th></tr>
+          <tr><td><b>Firebase</b></td><td>Autenticação, banco de dados em tempo real e notificações — amplamente
+            usado em apps mobile.</td></tr>
+          <tr><td><b>AWS Amplify</b></td><td>APIs GraphQL e REST, armazenamento de arquivos e integração com AWS
+            Lambda.</td></tr>
+        </table>
+
+        <p><b>Casos de uso típicos:</b> aplicativos que precisam de notificações em tempo real e gerenciamento de
+          grandes volumes de dados em nuvem sem manter servidor próprio.</p>
+
+        <div class="callout info"><b>Trade-off a considerar:</b> BaaS acelera o desenvolvimento, mas também cria
+          <i>dependência de um provedor externo</i> — vale pensar em custos de escala, limites de uso gratuito e o
+          que acontece se o serviço apresentar instabilidade.</div>
+      </div>
+
+      <div class="scenario">
+        <b class="title">Situação-problema — Foodly</b>
+        A Foodly, um aplicativo de pedidos de comida, quer implementar notificações para alertar usuários sobre
+        promoções e confirmar pedidos. A equipe deseja usar o <b>Firebase</b> para essa funcionalidade.
+      </div>
+
+      <div class="card">
+        <h3>Atividade prática — o que fazer</h3>
+        <ol>
+          <li>Pesquisem como o Firebase oferece suporte para autenticação e notificações.</li>
+          <li>Planejem a estrutura necessária para gerenciar usuários e enviar notificações.</li>
+          <li>Identifiquem desafios que podem surgir ao usar um serviço BaaS (ex.: limites de uso, dependência do
+            provedor, custos) e pensem em como a Foodly poderia superá-los.</li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- ===================== AULA 3 ===================== -->
+    <section id="aula3">
+      <div class="section-head"><span class="section-num">3</span>
+        <h2>Integração com serviços de mensageria</h2>
+      </div>
+      <div class="section-sub">Aula 3 · [SIS]ANO2C1B3S18A3</div>
+
+      <div class="card">
+        <h3>Conceitos-chave</h3>
+        <p>Serviços de mensageria — como <b>RabbitMQ</b> ou o <b>Firebase Cloud Messaging (FCM)</b> — facilitam o
+          envio e recebimento de mensagens entre dispositivos ou sistemas. São amplamente usados em notificações
+          <i>push</i>, chats e comunicação entre sistemas.</p>
+
+        <h4>Configuração</h4>
+        <ul>
+          <li>Configuração inicial do serviço escolhido (ex.: criação de filas no RabbitMQ).</li>
+          <li>Registro de dispositivos para que possam receber notificações.</li>
+        </ul>
+
+        <h4>Envio e recebimento de mensagens</h4>
+        <ul>
+          <li>Mensagens podem ser enviadas a usuários específicos ou em massa, dependendo do contexto.</li>
+          <li>É importante gerenciar <b>filas</b> e <b>confirmações de entrega</b> para garantir que as mensagens
+            realmente cheguem ao destino.</li>
+        </ul>
+
+        <div class="callout info"><b>Por que gerenciar filas importa:</b> sem uma fila bem gerenciada, mensagens
+          podem se perder, chegar fora de ordem ou ser entregues em duplicidade quando o sistema está sob carga ou
+          quando um dispositivo está temporariamente offline.</div>
+      </div>
+
+      <div class="scenario">
+        <b class="title">Situação-problema — ShopTrack</b>
+        O aplicativo ShopTrack deseja implementar notificações que informam o status do pedido (ex.: "Pedido
+        enviado", "Pedido entregue"), utilizando o Firebase Cloud Messaging.
+      </div>
+
+      <div class="card">
+        <h3>Atividade prática — o que fazer</h3>
+        <ol>
+          <li>Pesquisem as etapas para configurar o Firebase Cloud Messaging.</li>
+          <li>Planejem como as notificações serão enviadas e recebidas pelos dispositivos.</li>
+          <li>Identifiquem como as mensagens poderiam ser categorizadas (ex.: por urgência ou tipo de evento) para
+            melhorar a experiência do usuário.</li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- ===================== AULA 4 ===================== -->
+    <section id="aula4">
+      <div class="section-head"><span class="section-num">4</span>
+        <h2>Armazenamento de dados e repositórios: monitoramento e logs</h2>
+      </div>
+      <div class="section-sub">Aula 4 · [SIS]ANO2C1B3S18A4</div>
+
+      <div class="card">
+        <h3>Ferramentas de monitoramento</h3>
+        <p>Ferramentas de monitoramento são essenciais em integrações com serviços de terceiros porque permitem
+          identificar, analisar e resolver problemas na interação entre o app e as APIs externas — coletando
+          métricas como erros, tempos de resposta e padrões de uso.</p>
+
+        <table>
+          <tr><th>Ferramenta</th><th>Para que serve</th><th>Benefícios</th></tr>
+          <tr>
+            <td><b>Firebase Crashlytics</b></td>
+            <td>Monitoramento de falhas em tempo real</td>
+            <td>Relatórios detalhados (dispositivo, SO, comportamento antes do erro); integração com e-mail/Slack</td>
+          </tr>
+          <tr>
+            <td><b>Sentry</b></td>
+            <td>Monitoramento de erros e falhas, com suporte a várias linguagens (Kotlin, Swift...)</td>
+            <td>Visualização do fluxo de eventos até o erro; rastreamento de desempenho (<i>performance tracing</i>)</td>
+          </tr>
+          <tr>
+            <td><b>Logcat</b></td>
+            <td>Ferramenta nativa do Android para exibir logs do sistema e do app</td>
+            <td>Uso simples via terminal (<code>adb logcat</code>); filtragem por tag ou nível</td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="card">
+        <h3>Análise de logs</h3>
+        <p><b>Análise de logs</b> é o processo de examinar os registros de eventos gerados por uma aplicação para
+          identificar comportamentos anômalos, erros ou a origem de problemas em tempo real.</p>
+
+        <div class="grid2">
+          <div class="obj-card"><b>Monitoramento da comunicação</b>Logs registram detalhes da interação entre o app
+            e as APIs de terceiros, facilitando a identificação de problemas.</div>
+          <div class="obj-card"><b>Métricas de desempenho</b>Permitem acompanhar falhas, uso e eficiência da
+            integração, ajudando a otimizar o sistema.</div>
+          <div class="obj-card"><b>Rastreamento de erros</b>Capturam falhas não identificadas por ferramentas
+            automáticas, permitindo correções antes que afetem o usuário.</div>
+        </div>
+
+        <h4>Tipos de logs</h4>
+        <table>
+          <tr><th>Tipo</th><th>O que registra</th><th>Exemplo</th></tr>
+          <tr><td>Logs de sistema</td><td>Execução geral do sistema operacional e do app</td><td>Consumo de
+            memória, erros de permissão</td></tr>
+          <tr><td>Logs personalizados</td><td>Criados pelo desenvolvedor para rastrear fluxos específicos</td>
+            <td>Validação de tokens</td></tr>
+        </table>
+
+        <h4>Níveis de logs (Logcat)</h4>
+        <table>
+          <tr><th>Nível</th><th>Descrição</th></tr>
+          <tr><td><span class="tag">Verbose (V)</span></td><td>Mensagens detalhadas, úteis para depuração.</td></tr>
+          <tr><td><span class="tag nosql">Debug (D)</span></td><td>Informações úteis durante o desenvolvimento.</td></tr>
+          <tr><td><span class="tag rel">Info (I)</span></td><td>Eventos gerais do sistema ou da aplicação.</td></tr>
+          <tr><td><span class="tag warn">Warning (W)</span></td><td>Situações que podem gerar problemas.</td></tr>
+          <tr><td><span class="tag" style="background:#fdeaea;color:var(--red);border-color:#f5c6c3">Error (E)</span></td>
+            <td>Mensagens de erro que interrompem um fluxo.</td></tr>
+        </table>
+      </div>
+
+      <div class="scenario">
+        <b class="title">Situação — CarSmart (simulação de crise)</b>
+        A equipe da CarSmart enfrenta reclamações de usuários por falhas frequentes na sincronização com o Dropbox.
+        A equipe também precisa sincronizar recibos com o Google Drive e monitorar falhas de autenticação (ex.: token
+        expirado). Você é convocado(a) para liderar uma simulação de crise: analisar a situação, identificar a causa
+        raiz e propor uma solução viável em 15 minutos, gerenciando também a comunicação com a equipe e os gestores.
+      </div>
+
+      <div class="callout ok"><b>Exemplos de log usados na aula:</b>
+        <pre><code>Log.e("CarSmartLog", "Erro: Token expirado durante autenticação")
+
+val startTime = System.currentTimeMillis()
+// Chamada à API
+val endTime = System.currentTimeMillis()
+Log.d("DropboxSync", "Tempo de resposta: ${'$'}{endTime - startTime} ms")</code></pre>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <h4>Material de estudos — Semana 18</h4>
+    <p>Conteúdo reorganizado e sintetizado a partir das aulas 1 a 4 (Integração com Serviços de Terceiros). As
+      perguntas originais dos roteiros de atividade foram combinadas em três perguntas de síntese — este material
+      traz o conteúdo necessário para respondê-las, mas não as respostas prontas.</p>
+  </footer>
+
+  <a class="toc-back" href="#visao-geral" title="Voltar ao topo">↑</a>
+
+</body>
+
+</html>

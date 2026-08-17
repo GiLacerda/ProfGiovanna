@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>S18 — CI/CD e Testes Automatizados | Material de Estudos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --accent: #52525b;
+      --accent-dark: #2f3033;
+      --dark: #1c1c1c;
+      --gray-900: #20232a;
+      --gray-700: #4a4f57;
+      --gray-500: #767c86;
+      --gray-200: #e7e9ec;
+      --gray-100: #f4f5f7;
+      --bg: #fafafa;
+      --card: #ffffff;
+      --green: #1e8e3e;
+      --amber: #b7791f;
+      --blue: #1a56db;
+      --red: #b3261e;
+      --code-bg: #282c34;
+      --code-text: #e6e6e6;
+      --radius: 14px;
+      --shadow: 0 2px 10px rgba(0, 0, 0, .06);
+      --shadow-lg: 0 14px 32px rgba(0, 0, 0, .10);
+    }
+
+    * { box-sizing: border-box }
+    html { scroll-behavior: smooth }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--dark);
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .topbar {
+      position: relative;
+      background: linear-gradient(120deg, var(--accent) 0%, var(--accent-dark) 100%);
+      color: #fff;
+      padding: 32px 6vw 30px;
+      overflow: hidden;
+    }
+
+    .topbar::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(circle at 88% 12%, rgba(255, 255, 255, .16) 0%, transparent 45%),
+        radial-gradient(circle at 100% 105%, rgba(255, 255, 255, .10) 0%, transparent 40%);
+      pointer-events: none;
+    }
+
+    .topbar-inner { position: relative; z-index: 1; }
+
+    .topbar-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .topbar .eyebrow {
+      font-size: .8rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      opacity: .85;
+      margin-bottom: 6px;
+    }
+
+    .topbar h1 { margin: 0 0 8px; font-size: 1.9rem; font-weight: 800; letter-spacing: -.01em; }
+    .topbar p { margin: 0; max-width: 760px; opacity: .95; font-size: .98rem; }
+
+    .badges { margin-top: 16px; display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .badge {
+      background: rgba(255, 255, 255, .18);
+      border: 1px solid rgba(255, 255, 255, .35);
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: .78rem;
+      transition: background .18s ease;
+    }
+    .badge:hover { background: rgba(255, 255, 255, .28); }
+
+    nav.tabs {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: #fff;
+      border-bottom: 1px solid var(--gray-200);
+      display: flex;
+      gap: 2px;
+      overflow-x: auto;
+      padding: 0 6vw;
+      box-shadow: var(--shadow);
+    }
+
+    nav.tabs a {
+      white-space: nowrap;
+      padding: 14px 16px;
+      color: var(--gray-700);
+      text-decoration: none;
+      font-size: .88rem;
+      font-weight: 600;
+      border-bottom: 3px solid transparent;
+      transition: color .15s ease, border-color .15s ease;
+    }
+    nav.tabs a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+    main { max-width: 980px; margin: 0 auto; padding: 34px 6vw 90px; }
+
+    section { margin-bottom: 52px; scroll-margin-top: 64px; }
+
+    .section-head { display: flex; align-items: center; gap: 14px; margin-bottom: 6px; }
+
+    .section-num {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+      color: #fff;
+      font-weight: 800;
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+      box-shadow: 0 4px 10px rgba(47, 48, 51, .18);
+    }
+
+    h2 { font-size: 1.5rem; margin: 0; color: var(--gray-900); }
+    .section-sub { color: var(--gray-500); font-size: .92rem; margin: 4px 0 22px 52px; }
+    h3 { font-size: 1.15rem; color: var(--gray-900); margin: 28px 0 10px; border-left: 4px solid var(--accent); padding-left: 10px; }
+    h4 { font-size: 1rem; color: var(--gray-900); margin: 18px 0 8px; }
+    p { margin: 0 0 12px; }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 20px 22px;
+      box-shadow: var(--shadow);
+      margin-bottom: 16px;
+      transition: box-shadow .2s ease, transform .2s ease;
+    }
+    .card:hover { box-shadow: var(--shadow-lg); transform: translateY(-2px); }
+
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+    @media(max-width:720px) {
+      .grid2 { grid-template-columns: 1fr; }
+      .section-sub { margin-left: 0; }
+    }
+
+    table { width: 100%; border-collapse: collapse; margin: 12px 0 20px; font-size: .9rem; }
+    th, td { text-align: left; padding: 10px 12px; border: 1px solid var(--gray-200); vertical-align: top; }
+    th { background: var(--gray-100); font-weight: 700; color: var(--gray-900); }
+    tr:nth-child(even) td { background: #fcfcfd; }
+    tbody tr:hover td { background: #f3f3f4; }
+    table { border-radius: 10px; overflow: hidden; }
+
+    .tag {
+      display: inline-block;
+      background: var(--gray-100);
+      border: 1px solid var(--gray-200);
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-size: .76rem;
+      font-weight: 600;
+      color: var(--gray-700);
+      margin: 2px 4px 2px 0;
+    }
+    .tag.rel { background: #eaf1ff; color: var(--blue); border-color: #cfe0ff; }
+    .tag.nosql { background: #eafaf0; color: var(--green); border-color: #cdefd9; }
+    .tag.warn { background: #fff3d6; color: var(--amber); border-color: #ffe2a8; }
+
+    code {
+      background: var(--gray-100);
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-family: 'Fira Code', Consolas, monospace;
+      font-size: .85em;
+      color: var(--accent-dark);
+    }
+
+    pre {
+      background: var(--code-bg);
+      color: var(--code-text);
+      padding: 16px 18px;
+      border-radius: 10px;
+      overflow-x: auto;
+      font-size: .83rem;
+      line-height: 1.5;
+      margin: 10px 0 18px;
+    }
+    pre code { background: none; color: inherit; padding: 0; }
+
+    .callout { border-radius: 10px; padding: 14px 18px; margin: 14px 0; font-size: .92rem; }
+    .callout.info { background: #eef4ff; border: 1px solid #cfe0ff; }
+    .callout.warn { background: #fff7e6; border: 1px solid #ffe2a8; }
+    .callout.ok { background: #eafaf0; border: 1px solid #cdefd9; }
+
+    .scenario {
+      background: var(--gray-100);
+      border-radius: 10px;
+      padding: 14px 18px;
+      font-size: .92rem;
+      margin-bottom: 14px;
+      border-left: 4px solid var(--gray-500);
+    }
+    .scenario b.title { display: block; color: var(--accent-dark); margin-bottom: 4px; }
+
+    ul, ol { margin: 0 0 14px; padding-left: 22px; }
+    li { margin-bottom: 6px; }
+
+    footer { background: var(--gray-900); color: #cfd2d8; padding: 34px 6vw; font-size: .82rem; }
+    footer a { color: #9fc2ff; }
+    footer h4 { color: #fff; margin-top: 0; }
+
+    .toc-back {
+      position: fixed; bottom: 20px; right: 20px;
+      background: var(--accent); color: #fff; width: 44px; height: 44px;
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      text-decoration: none; box-shadow: 0 4px 12px rgba(0, 0, 0, .25); font-size: 1.1rem;
+      transition: transform .15s ease, background .15s ease;
+    }
+    .toc-back:hover { background: var(--accent-dark); transform: translateY(-3px); }
+
+    .objectives { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 18px 0 6px; }
+    @media(max-width:720px) { .objectives { grid-template-columns: 1fr; } }
+
+    .obj-card {
+      background: #fff; border: 1px solid var(--gray-200); border-radius: 10px;
+      padding: 14px 16px; font-size: .85rem;
+    }
+    .obj-card b { display: block; color: var(--accent-dark); margin-bottom: 4px; font-size: .78rem; text-transform: uppercase; letter-spacing: .04em; }
+
+    /* Perguntas de síntese */
+    .synth {
+      background: #fff;
+      border: 1px solid var(--gray-200);
+      border-left: 5px solid var(--accent-dark);
+      border-radius: 10px;
+      padding: 18px 22px;
+      margin: 0 0 16px;
+    }
+    .synth-head { display: flex; align-items: center; margin-bottom: 8px; }
+    .synth-head b { font-size: 1rem; color: var(--gray-900); }
+    .synth-num {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--accent-dark); color: #fff; font-weight: 800; font-size: .85rem;
+      margin-right: 10px; flex-shrink: 0;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="topbar-top">
+        <div>
+          <div class="eyebrow">Técnico em Desenvolvimento de Sistemas · Integração com Serviços Externos e
+            Esteiras de Entrega · Unidade 4</div>
+          <h1>Semana 18 — CI/CD e Testes Automatizados</h1>
+          <p>Material de estudos consolidado a partir das aulas 1 a 3: pipelines de CI/CD, testes automatizados
+            para front-end e testes de performance. Conteúdo reorganizado e sintetizado para que você consiga
+            responder às atividades propostas.</p>
+        </div>
+      </div>
+      <div class="badges">
+        <span class="badge">Aula 1 · CI/CD para front-end</span>
+        <span class="badge">Aula 2 · Testes automatizados</span>
+        <span class="badge">Aula 3 · Testes de performance</span>
+      </div>
+    </div>
+  </div>
+
+  <nav class="tabs">
+    <a href="#visao-geral">Visão geral</a>
+    <a href="#aula1">1. CI/CD</a>
+    <a href="#aula2">2. Testes automatizados</a>
+    <a href="#aula3">3. Testes de performance</a>
+    <a href="./Semana18.docx" download>Perguntas de síntese</a>
+  </nav>
+
+  <main>
+
+    <section id="visao-geral">
+      <div class="section-head"><span class="section-num">•</span>
+        <h2>Visão geral da semana</h2>
+      </div>
+      <div class="section-sub">Como as três aulas se conectam</div>
+      <div class="card">
+        <p>A Semana 18 trata de <b>automatizar a entrega de uma aplicação front-end com qualidade</b>. Primeiro
+          aprendemos a montar um <b>pipeline de CI/CD</b>, que automatiza testes, build e deploy a cada mudança no
+          código (Aula 1). Em seguida vemos como escrever os <b>testes automatizados</b> que rodam dentro desse
+          pipeline — testes unitários (Jest) e testes de integração/ponta a ponta (Cypress) (Aula 2). Por fim,
+          aprendemos a testar a <b>performance</b> da aplicação, garantindo que ela continue rápida mesmo com muitos
+          usuários ao mesmo tempo (Aula 3). As três aulas descrevem, juntas, como entregar código com confiança:
+          automatizando o processo, testando a lógica e testando a velocidade.</p>
+        <div class="objectives">
+          <div class="obj-card"><b>Aula 1</b>Configurar e utilizar pipelines de CI/CD para aplicações front-end.
+          </div>
+          <div class="obj-card"><b>Aula 2</b>Implementar testes automatizados para assegurar a qualidade das
+            aplicações front-end.</div>
+          <div class="obj-card"><b>Aula 3</b>Implementar testes de performance para garantir a eficiência das
+            aplicações front-end.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== AULA 1 ===================== -->
+    <section id="aula1">
+      <div class="section-head"><span class="section-num">1</span>
+        <h2>CI/CD para front-end</h2>
+      </div>
+      <div class="section-sub">Aula 1 · [SIS]ANO2C3B3S18A1</div>
+
+      <div class="card">
+        <h3>Conceitos-chave</h3>
+        <p><b>CI/CD</b> significa <i>Integração Contínua</i> (Continuous Integration) e <i>Entrega/Implantação
+          Contínua</i> (Continuous Delivery/Deployment). Um <b>pipeline de CI/CD</b> automatiza o caminho do código
+          desde o commit até a produção, rodando etapas em sequência sempre que há uma mudança no repositório.</p>
+
+        <h4>Etapas típicas de um pipeline (ex.: GitHub Actions)</h4>
+        <table>
+          <tr><th>Etapa</th><th>O que faz</th></tr>
+          <tr><td>1. Instalação de dependências</td><td><code>npm install</code> — prepara o ambiente com tudo que o
+            projeto precisa.</td></tr>
+          <tr><td>2. Testes automatizados</td><td><code>npm test -- --coverage</code> — roda os testes; se algum
+            falhar, o pipeline para aqui.</td></tr>
+          <tr><td>3. Build</td><td><code>npm run build</code> — só executa se os testes passarem; gera a versão
+            pronta para produção.</td></tr>
+          <tr><td>4. Deploy automático</td><td>Publica o build em um ambiente como GitHub Pages, Vercel ou Netlify.
+          </td></tr>
+        </table>
+
+        <p>Esse pipeline costuma ser configurado em um arquivo <code>ci-cd.yml</code>, dentro da pasta
+          <code>.github/workflows/</code> do repositório, definindo quando o pipeline roda (ex.: a cada
+          <i>push</i> ou <i>pull request</i> na branch <code>main</code>) e quais etapas ele executa, na ordem.</p>
+
+        <div class="callout info"><b>Por que automatizar isso importa:</b> sem um pipeline, testar, compilar e
+          publicar o código manualmente é demorado e sujeito a erros — é fácil esquecer uma etapa ou publicar código
+          com bugs. O pipeline garante que toda mudança passe pelas mesmas verificações antes de chegar ao
+          usuário.</div>
+      </div>
+
+      <div class="scenario">
+        <b class="title">Situação-problema</b>
+        Uma equipe de desenvolvimento front-end de um e-commerce faz atualizações semanais para melhorar a
+        experiência do usuário e a segurança do site. Como o processo de testar, compilar e publicar o código é
+        manual, é demorado, repetitivo e sujeito a erros — bugs chegam aos usuários e geram insatisfação.
+      </div>
+
+      <div class="card">
+        <h3>Atividade prática — o que fazer</h3>
+        <ol>
+          <li>Preparem um repositório no GitHub com uma aplicação front-end (React, Vue.js ou Angular) e uma
+            estrutura básica de testes.</li>
+          <li>Configurem um workflow no GitHub Actions (arquivo <code>ci-cd.yml</code>) que rode a cada
+            <i>push</i>/<i>pull request</i> na branch principal.</li>
+          <li>Adicionem as etapas de instalação de dependências, testes automatizados, build e deploy (ex.:
+            GitHub Pages com a biblioteca <code>gh-pages</code>).</li>
+          <li>Testem o pipeline com um <i>pull request</i> e corrijam eventuais falhas apontadas nos logs do GitHub
+            Actions.</li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- ===================== AULA 2 ===================== -->
+    <section id="aula2">
+      <div class="section-head"><span class="section-num">2</span>
+        <h2>Testes automatizados para front-end</h2>
+      </div>
+      <div class="section-sub">Aula 2 · [SIS]ANO2C3B3S18A2</div>
+
+      <div class="card">
+        <h3>Conceitos-chave</h3>
+        <p>Garantir a qualidade de um sistema que muda com frequência é um desafio: cada nova funcionalidade pode
+          quebrar algo que já funcionava. Testes automatizados ajudam a pegar esses erros antes que cheguem ao
+          usuário.</p>
+
+        <table>
+          <tr><th>Ferramenta</th><th>Tipo de teste</th><th>Para que serve</th></tr>
+          <tr>
+            <td><b>Jest</b></td>
+            <td>Teste unitário</td>
+            <td>Verifica se uma função ou componente isolado se comporta como esperado.</td>
+          </tr>
+          <tr>
+            <td><b>Cypress</b></td>
+            <td>Teste de integração / ponta a ponta (E2E)</td>
+            <td>Verifica se diferentes partes da aplicação funcionam corretamente <i>juntas</i>, simulando o
+              caminho real do usuário na interface.</td>
+          </tr>
+        </table>
+
+        <div class="callout info"><b>Pirâmide de testes:</b> cada tipo de teste tem um custo de manutenção e um
+          valor diferente para o projeto. Testes unitários são mais rápidos e baratos de manter; testes de
+          integração/E2E custam mais, mas verificam se o sistema funciona como um todo.</div>
+      </div>
+
+      <div class="scenario">
+        <b class="title">Situação-problema — Sistema de reservas de hotéis</b>
+        Um sistema de reservas de hotéis recebe novos recursos com frequência (filtros de busca, promoções
+        personalizadas). Isso tem gerado bugs em funcionalidades que já estavam estáveis, como exibição de datas e
+        cálculo de preços — erros descobertos só depois que o sistema já está em produção.
+      </div>
+
+      <div class="scenario">
+        <b class="title">Situação — XYZ Comércio Digital (simulação)</b>
+        A XYZ Comércio Digital desenvolve um e-commerce com uma equipe distribuída, em que cada grupo cuida de uma
+        parte do sistema (busca, cálculo de preços, checkout). Ao integrar o trabalho de todos, a equipe percebe que
+        partes que funcionam sozinhas falham quando trabalham juntas: os produtos são adicionados corretamente ao
+        carrinho, mas o preço total no checkout fica errado.
+      </div>
+    </section>
+
+    <!-- ===================== AULA 3 ===================== -->
+    <section id="aula3">
+      <div class="section-head"><span class="section-num">3</span>
+        <h2>Testes de performance para front-end</h2>
+      </div>
+      <div class="section-sub">Aula 3 · [SIS]ANO2C3B3S18A3</div>
+
+      <div class="card">
+        <h3>Conceitos-chave</h3>
+        <p>Testes de performance verificam se a aplicação continua rápida e responsiva mesmo sob carga — ou seja,
+          com muitos usuários acessando ao mesmo tempo.</p>
+
+        <table>
+          <tr><th>Ferramenta</th><th>Para que serve</th></tr>
+          <tr><td><b>Lighthouse</b> (Chrome DevTools)</td><td>Gera um relatório de performance de uma página:
+            tempo de carregamento, responsividade e sugestões de melhoria.</td></tr>
+          <tr><td><b>Apache JMeter / k6</b></td><td>Simulam carga e stress, acessando a aplicação repetidamente com
+            um número crescente de usuários simultâneos.</td></tr>
+        </table>
+
+        <h4>Métricas do Lighthouse</h4>
+        <ul>
+          <li><b>LCP</b> (Largest Contentful Paint) — tempo até o maior elemento visível da página carregar.</li>
+          <li><b>TTI</b> (Time to Interactive) — tempo até a página ficar totalmente interativa.</li>
+          <li><b>FID</b> (First Input Delay) — tempo de resposta à primeira interação do usuário.</li>
+        </ul>
+
+        <div class="callout info"><b>Processo típico:</b> gerar um relatório com o Lighthouse → simular carga
+          crescente (ex.: de 50 até 500 usuários simultâneos) com JMeter ou k6, observando tempo de resposta e taxa
+          de erros → cruzar os dois resultados para identificar gargalos → propor melhorias, como otimizar imagens,
+          reduzir o tamanho dos arquivos JavaScript ou melhorar o cache.</div>
+      </div>
+
+      <div class="scenario">
+        <b class="title">Situação-problema — WebFast</b>
+        A WebFast, um e-commerce conhecido pela alta performance, precisa garantir que a aplicação continue eficiente
+        mesmo com um grande número de usuários simultâneos. A equipe decide implementar testes de carga e análise de
+        performance para medir o tempo de resposta e identificar possíveis gargalos.
+      </div>
+
+      <div class="card">
+        <h3>Atividade prática — o que entregar</h3>
+        <ul>
+          <li>Um relatório de performance com as métricas do Lighthouse.</li>
+          <li>Gráficos de carga e tempo de resposta gerados com JMeter ou k6.</li>
+          <li>Uma análise apontando os gargalos identificados e propostas de melhoria.</li>
+        </ul>
+      </div>
+    </section>
+
+  <footer>
+    <h4>Material de estudos — Semana 18 (Front End)</h4>
+    <p>Conteúdo reorganizado e sintetizado a partir das aulas 1 a 3 (CI/CD e Testes Automatizados). As perguntas
+      originais dos roteiros de atividade foram combinadas em três perguntas de síntese — este material traz o
+      conteúdo necessário para respondê-las, mas não as respostas prontas.</p>
+  </footer>
+
+  <a class="toc-back" href="#visao-geral" title="Voltar ao topo">↑</a>
+
+</body>
+
+</html>
