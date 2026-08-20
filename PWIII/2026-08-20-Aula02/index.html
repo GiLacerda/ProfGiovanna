@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PHP - Listagem e Cadastro</title>
+  <title>PWIII — Aula 02: Listagem e Cadastro com PHP + PDO</title>
   <style>
     :root {
       --bg: #f4f7fb;
@@ -14,8 +14,12 @@
       --muted: #6b7280;
       --border: #dfe7f1;
       --success: #0f9f6e;
+      --success-dark: #0b7e58;
       --warning: #f59e0b;
+      --violet: #6a4fc7;
       --shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+      --code-bg: #111827;
+      --code-ink: #e5e7eb;
     }
 
     * { box-sizing: border-box; }
@@ -33,10 +37,7 @@
       margin: 40px auto;
     }
 
-    h1, h2, h3 {
-      color: var(--text);
-      margin-top: 0;
-    }
+    h1, h2, h3 { color: var(--text); margin-top: 0; }
 
     .card {
       background: var(--card);
@@ -47,25 +48,91 @@
       margin-bottom: 24px;
     }
 
-    .small {
-      color: var(--muted);
-      font-size: 0.95rem;
-    }
+    .card.accent { border-left: 5px solid var(--primary); }
+    .card.accent-success { border-left: 5px solid var(--success); }
+    .card.accent-violet { border-left: 5px solid var(--violet); }
+    .card.accent-warning { border-left: 5px solid var(--warning); }
 
-    .btn {
-      display: inline-block;
-      text-decoration: none;
-      background: var(--primary);
+    .small { color: var(--muted); font-size: 0.95rem; }
+
+    /* ---- Hero / topo com botão de download ---- */
+    .hero {
+      background: linear-gradient(135deg, #1f6feb, #6a4fc7);
+      border-radius: 16px;
+      padding: 32px 30px;
       color: white;
-      padding: 10px 16px;
-      border-radius: 9px;
-      font-weight: 600;
-      margin-top: 12px;
+      margin-bottom: 28px;
+      box-shadow: var(--shadow);
     }
 
-    .btn:hover {
-      background: var(--primary-dark);
+    .hero .eyebrow {
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      font-size: 12.5px;
+      opacity: .85;
+      margin: 0 0 8px;
+      font-weight: 700;
     }
+
+    .hero h1 { color: #fff; font-size: 1.7rem; margin-bottom: 10px; }
+    .hero p { color: rgba(255,255,255,0.9); max-width: 65ch; margin: 0 0 20px; }
+
+    .download-box {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 12px;
+      padding: 16px 18px;
+    }
+
+    .btn-download {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      background: #ffffff;
+      color: var(--primary-dark);
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 1rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .btn-download:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(0,0,0,0.2); }
+    .btn-download svg { flex-shrink: 0; }
+
+    .download-info { color: rgba(255,255,255,0.85); font-size: 0.9rem; }
+    .download-info code { background: rgba(0,0,0,0.25); color: #fff; }
+
+    /* ---- navegação rápida ---- */
+    .nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 0 0 28px;
+      padding: 14px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+
+    .nav a {
+      font-family: "Courier New", monospace;
+      font-size: 12.5px;
+      color: var(--muted);
+      text-decoration: none;
+      background: var(--bg);
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+    }
+
+    .nav a:hover { background: #eef4ff; color: var(--primary); border-color: var(--primary); }
 
     table {
       width: 100%;
@@ -73,342 +140,541 @@
       margin-top: 14px;
     }
 
-    th, td {
-      border: 1px solid var(--border);
-      padding: 10px 12px;
-      text-align: left;
-    }
-
-    th {
-      background: #eef4ff;
-    }
+    th, td { border: 1px solid var(--border); padding: 10px 12px; text-align: left; vertical-align: top; }
+    th { background: #eef4ff; }
 
     pre {
-      background: #111827;
-      color: #e5e7eb;
+      background: var(--code-bg);
+      color: var(--code-ink);
       border-radius: 12px;
       padding: 16px;
       overflow-x: auto;
-      font-size: 0.9rem;
-      line-height: 1.5;
+      font-size: 0.87rem;
+      line-height: 1.55;
+      margin: 12px 0;
     }
 
-    code {
+    code { font-family: "Courier New", monospace; }
+
+    p code, li code {
+      background: #eef0f4;
+      color: #213066;
+      padding: 2px 6px;
+      border-radius: 5px;
+      font-size: 0.87em;
+    }
+
+    .filetab {
+      display: inline-block;
       font-family: "Courier New", monospace;
+      font-size: 12.5px;
+      color: #9aa1b2;
+      background: #1c202a;
+      padding: 5px 12px;
+      border-radius: 6px;
+      margin-bottom: 8px;
     }
 
-    form {
-      display: grid;
-      gap: 12px;
-      max-width: 520px;
+    .explica {
       margin-top: 10px;
+      padding: 12px 14px;
+      background: #f7f9fc;
+      border-left: 3px solid var(--primary);
+      border-radius: 0 8px 8px 0;
     }
 
-    label {
-      display: grid;
-      gap: 7px;
-      font-weight: 600;
-    }
+    .explica strong { color: var(--primary-dark); }
 
-    input, button {
-      padding: 10px 12px;
-      font-size: 1rem;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-    }
-
-    button {
-      background: var(--success);
-      color: white;
-      border: none;
-      cursor: pointer;
+    ul.check { list-style: none; margin: 0; padding: 0; }
+    ul.check li { position: relative; padding-left: 24px; margin-bottom: 10px; }
+    ul.check li::before {
+      content: "✓";
+      position: absolute; left: 0; top: 0;
+      color: var(--success);
       font-weight: 700;
     }
 
-    .exemplo {
-      display: grid;
-      grid-template-columns: 1.2fr 1fr;
-      gap: 18px;
+    .steps { list-style: none; margin: 0; padding: 0; counter-reset: step; }
+    .steps li {
+      counter-increment: step;
+      position: relative;
+      padding: 0 0 18px 38px;
+      border-left: 2px solid var(--border);
+      margin-left: 12px;
+    }
+    .steps li:last-child { border-left-color: transparent; padding-bottom: 0; }
+    .steps li::before {
+      content: counter(step);
+      position: absolute; left: -15px; top: -2px;
+      width: 26px; height: 26px;
+      background: var(--code-bg);
+      color: #fff;
+      font-family: "Courier New", monospace;
+      font-weight: 700;
+      font-size: 12px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
     }
 
-    @media (max-width: 800px) {
-      .exemplo {
-        grid-template-columns: 1fr;
-      }
+    .flow {
+      font-family: "Courier New", monospace;
+      background: var(--code-bg);
+      color: var(--code-ink);
+      border-radius: 12px;
+      padding: 18px;
+      line-height: 2;
+      font-size: 0.88rem;
+      text-align: center;
+    }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 12.5px;
+      margin-top: 20px;
+    }
+
+    @media (max-width: 640px) {
+      .container { margin: 20px auto; }
+      .hero { padding: 24px 20px; }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>PHP: listagem de dados e tela de cadastro</h1>
-    <p class="small">
-      Material didático simples para explicar a lógica de uma tela de listagem e cadastro.
-      Aqui não entra filtro, paginação, validação avançada nem camada de segurança.
-      O objetivo é mostrar o fluxo básico e a lógica da programação.
-    </p>
 
-    <div class="card">
-      <h2>1) Ideia geral</h2>
+    <!-- ===================== TOPO: botão de download do material ===================== -->
+    <div class="hero">
+      <p class="eyebrow">PWIII · Aula 02 · 20/08</p>
+      <h1>Listagem e Cadastro com PHP + PDO — “Cadastro de Usuários”</h1>
       <p>
-        Em uma aplicação web com PHP, normalmente a lógica é esta:
+        Material de consulta com o código completo usado em aula: uma tela que lista usuários
+        cadastrados no banco de dados e um formulário para cadastrar novos. Abaixo, cada arquivo é
+        explicado parte por parte — a ideia é que vocês consigam voltar aqui sempre que precisarem
+        relembrar a lógica.
       </p>
-      <ul>
-        <li>Conectar ao banco de dados.</li>
-        <li>Executar uma consulta SQL.</li>
-        <li>Receber os resultados.</li>
-        <li>Montar a tela HTML.</li>
-        <li>Mostrar os dados em uma tabela.</li>
-      </ul>
-      <p>
-        A parte importante é entender que o PHP serve para preparar os dados e o HTML serve
-        para apresentar esses dados em tela. O PHP não "cria a página como no Photoshop"; ele
-        gera código HTML dinamicamente.
-      </p>
-    </div>
-
-    <div class="card">
-      <h2>2) Exemplo simples de listagem</h2>
-      <div class="exemplo">
-        <div>
-          <p>Suponha que a tabela do banco seja <strong>clientes</strong>:</p>
-          <pre><code>CREATE TABLE clientes (
-  id INT PRIMARY KEY AUTO_INCREMENT,
-  nome VARCHAR(100),
-  email VARCHAR(100),
-  telefone VARCHAR(20)
-);</code></pre>
-
-          <p>Exemplo de dados:</p>
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Nome</th>
-                <th>E-mail</th>
-                <th>Telefone</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>1</td>
-                <td>Maria Silva</td>
-                <td>maria@email.com</td>
-                <td>(11) 99999-1111</td>
-              </tr>
-              <tr>
-                <td>2</td>
-                <td>João Souza</td>
-                <td>joao@email.com</td>
-                <td>(11) 98888-2222</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div>
-          <p class="small">O que a tela precisa fazer:</p>
-          <ul>
-            <li>Buscar os clientes no banco.</li>
-            <li>Guardar em uma variável.</li>
-            <li>Loopar os dados.</li>
-            <li>Gerar cada linha da tabela.</li>
-          </ul>
-          <a class="btn" href="#php-listagem">Ver o código PHP</a>
-        </div>
+      <div class="download-box">
+        <a class="btn-download" href="style.zip" download>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3v12"></path>
+            <path d="M7 10l5 5 5-5"></path>
+            <path d="M4 19h16"></path>
+          </svg>
+          Baixar código-fonte (.zip)
+        </a>
+        <span class="download-info">
+          Contém <code>index.php</code>, <code>cadastro.php</code>, <code>conn.php</code> e <code>style.css</code>.
+        </span>
       </div>
     </div>
 
-    <div class="card" id="php-listagem">
-      <h2>3) Código PHP da listagem</h2>
-      <pre><code>&lt;?php
-$host = 'localhost';
-$user = 'root';
-$password = '';
-$dbname = 'aula_php';
+    <!-- ===================== NAVEGAÇÃO RÁPIDA ===================== -->
+    <nav class="nav" aria-label="Navegação rápida">
+      <a href="#visao-geral">Visão geral</a>
+      <a href="#estrutura">Estrutura de arquivos</a>
+      <a href="#conn">conn.php</a>
+      <a href="#index">index.php</a>
+      <a href="#cadastro">cadastro.php</a>
+      <a href="#css">style.css</a>
+      <a href="#fluxo">Fluxo completo</a>
+      <a href="#glossario">Glossário</a>
+      <a href="#dicas">Dicas e cuidados</a>
+    </nav>
 
-$conn = new mysqli($host, $user, $password, $dbname);
+    <!-- ===================== VISÃO GERAL ===================== -->
+    <section id="visao-geral">
+      <div class="card accent">
+        <h2>1) Visão geral do exemplo</h2>
+        <p>
+          O tema deste exemplo é um cadastro de <strong>usuários</strong> (inspirado no jogo Candy Crush,
+          só para deixar mais divertido): cada usuário tem um nome de login, um apelido (nickname) e
+          uma cor favorita. A aplicação tem duas telas:
+        </p>
+        <ul class="check">
+          <li><strong>Listagem (<code>index.php</code>):</strong> mostra todos os usuários cadastrados em uma tabela.</li>
+          <li><strong>Cadastro (<code>cadastro.php</code>):</strong> formulário que insere um novo usuário no banco.</li>
+        </ul>
+        <p>
+          A lógica geral é sempre a mesma nesse tipo de aplicação: <strong>PHP conecta ao banco, busca ou
+          grava dados, e o HTML mostra o resultado na tela.</strong> O PHP não desenha nada visualmente —
+          ele só gera o texto HTML que o navegador depois interpreta.
+        </p>
+      </div>
+    </section>
 
-if ($conn-&gt;connect_error) {
-    die('Erro na conexão: ' . $conn-&gt;connect_error);
-}
+    <!-- ===================== ESTRUTURA DE ARQUIVOS ===================== -->
+    <section id="estrutura">
+      <div class="card">
+        <h2>2) Estrutura de arquivos</h2>
+        <table>
+          <thead>
+            <tr><th>Arquivo</th><th>Função</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>conn.php</code></td>
+              <td>Abre a conexão com o banco de dados usando PDO. Todo arquivo que precisa falar com o banco começa incluindo este arquivo.</td>
+            </tr>
+            <tr>
+              <td><code>index.php</code></td>
+              <td>Página principal. Busca todos os usuários no banco e monta a tabela HTML com os resultados.</td>
+            </tr>
+            <tr>
+              <td><code>cadastro.php</code></td>
+              <td>Mostra o formulário de cadastro e, quando o formulário é enviado, insere o novo usuário no banco.</td>
+            </tr>
+            <tr>
+              <td><code>style.css</code></td>
+              <td>Estilização visual: cores, espaçamento, aparência da tabela, do formulário e dos botões.</td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="small" style="margin-top:14px;">
+          Note que <strong>não existe um arquivo separado só para "processar o cadastro"</strong>: o próprio
+          <code>cadastro.php</code> mostra o formulário <em>e</em> trata o envio dele, dependendo do método da
+          requisição (<code>GET</code> ou <code>POST</code>). Essa é uma variação comum do padrão que vocês já viram.
+        </p>
+      </div>
+    </section>
 
-$sql = 'SELECT id, nome, email, telefone FROM clientes ORDER BY nome';
-$result = $conn-&gt;query($sql);
+    <!-- ===================== conn.php ===================== -->
+    <section id="conn">
+      <div class="card accent-success">
+        <h2>3) <code>conn.php</code> — conexão com o banco</h2>
+        <span class="filetab">conn.php</span>
+        <pre><code>&lt;?php
+
+$host    = 'localhost';        // onde o banco está rodando
+$dbname  = 'modular_pwiii';    // nome do banco
+$usuario = 'root';
+$senha   = '';
+
+$dsn = "mysql:host=$host;dbname=$dbname;charset=utf8mb4";
+
+try {
+    $pdo = new PDO($dsn, $usuario, $senha);
+    //echo "Conectado com sucesso!";
+} catch (PDOException $e) {
+    die("Erro ao conectar: " . $e-&gt;getMessage());
+}</code></pre>
+
+        <div class="explica">
+          <p><strong>O que cada parte faz:</strong></p>
+          <ul class="check">
+            <li><code>$host</code>, <code>$dbname</code>, <code>$usuario</code>, <code>$senha</code>: são as informações
+              necessárias para acessar o banco MySQL — endereço do servidor, nome do banco e credenciais de acesso.</li>
+            <li><code>$dsn</code> (Data Source Name): é uma "receita" que diz ao PHP qual driver usar (<code>mysql</code>),
+              em qual host e banco conectar, e qual codificação de caracteres usar (<code>utf8mb4</code>, que suporta acentos e emojis).</li>
+            <li><code>new PDO(...)</code>: <strong>PDO</strong> (PHP Data Objects) é a classe do PHP usada para se conectar
+              a bancos de dados de forma segura e padronizada. Se a conexão der certo, o objeto é guardado na variável
+              <code>$pdo</code> — é esse objeto que vamos reaproveitar em <code>index.php</code> e <code>cadastro.php</code>.</li>
+            <li><code>try { ... } catch (PDOException $e) { ... }</code>: se a conexão falhar (senha errada, banco fora do ar
+              etc.), o PHP lança uma exceção. O bloco <code>catch</code> "pega" esse erro e chama <code>die()</code>, que
+              interrompe a execução mostrando a mensagem de erro, em vez de deixar a página quebrar silenciosamente.</li>
+          </ul>
+          <p><strong>Por que isolar isso em um arquivo próprio?</strong> Porque tanto <code>index.php</code> quanto
+          <code>cadastro.php</code> precisam se conectar ao banco. Em vez de repetir esse código nos dois arquivos,
+          cada um simplesmente faz <code>require_once "conn.php";</code> no início.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== index.php ===================== -->
+    <section id="index">
+      <div class="card accent">
+        <h2>4) <code>index.php</code> — listagem de usuários</h2>
+        <span class="filetab">index.php</span>
+        <pre><code>&lt;?php
+require_once "conn.php";
+
+$stmt = $pdo-&gt;prepare("SELECT id, usuario, nickname, cor FROM usuario");
+$stmt-&gt;execute();
+
+$usuarios = $stmt-&gt;fetchAll(PDO::FETCH_ASSOC);
 ?&gt;
+&lt;HTML&gt;
+    &lt;HEAD&gt;
+        &lt;META CHARSET="UTF-8"/&gt;
+        &lt;LINK HREF="style.css" REL="STYLESHEET"/&gt;
+        &lt;TITLE&gt;Candy Crush&lt;/TITLE&gt;
+    &lt;/HEAD&gt;
+    &lt;BODY&gt;
+        &lt;H1&gt;Lista de usuários&lt;/H1&gt;
+        &lt;A HREF="cadastro.php" CLASS="btn-novo"&gt;Novo +&lt;/A&gt;
+        &lt;TABLE&gt;
+            &lt;TR&gt;
+                &lt;TH&gt;ID&lt;/TH&gt;
+                &lt;TH&gt;Usuário&lt;/TH&gt;
+                &lt;TH&gt;Nick&lt;/TH&gt;
+                &lt;TH&gt;Cor&lt;/TH&gt;
+            &lt;/TR&gt;
+            &lt;?php
+            foreach ($usuarios as $usuario) {
+                echo "&lt;TR&gt;";
+                echo "&lt;TD&gt;".$usuario['id']."&lt;/TD&gt;";
+                echo "&lt;TD&gt;".$usuario['usuario']."&lt;/TD&gt;";
+                echo "&lt;TD&gt;".$usuario['nickname']."&lt;/TD&gt;";
+                echo "&lt;TD&gt;&lt;span class='color-badge' style='background-color: ".$usuario['cor'].";'&gt;&lt;/span&gt;".$usuario['cor']."&lt;/TD&gt;";
+                echo "&lt;/TR&gt;";
+            }
+            ?&gt;
+        &lt;/TABLE&gt;
+    &lt;/BODY&gt;
+&lt;/HTML&gt;</code></pre>
 
-&lt;table&gt;
-    &lt;thead&gt;
-        &lt;tr&gt;
-            &lt;th&gt;ID&lt;/th&gt;
-            &lt;th&gt;Nome&lt;/th&gt;
-            &lt;th&gt;E-mail&lt;/th&gt;
-            &lt;th&gt;Telefone&lt;/th&gt;
-        &lt;/tr&gt;
-    &lt;/thead&gt;
-    &lt;tbody&gt;
-        &lt;?php while ($cliente = $result-&gt;fetch_assoc()) { ?&gt;
-            &lt;tr&gt;
-                &lt;td&gt;&lt;?php echo $cliente['id']; ?&gt;&lt;/td&gt;
-                &lt;td&gt;&lt;?php echo $cliente['nome']; ?&gt;&lt;/td&gt;
-                &lt;td&gt;&lt;?php echo $cliente['email']; ?&gt;&lt;/td&gt;
-                &lt;td&gt;&lt;?php echo $cliente['telefone']; ?&gt;&lt;/td&gt;
-            &lt;/tr&gt;
-        &lt;?php } ?&gt;
-    &lt;/tbody&gt;
-&lt;/table&gt;
+        <div class="explica">
+          <p><strong>Passo a passo da lógica:</strong></p>
+          <ol class="steps">
+            <li><code>require_once "conn.php";</code> — inclui o arquivo de conexão. Depois desta linha, a variável
+              <code>$pdo</code> já existe e está pronta para uso. O <code>_once</code> garante que o arquivo não seja
+              incluído duas vezes, evitando erro de "conexão já criada".</li>
+            <li><code>$pdo->prepare("SELECT id, usuario, nickname, cor FROM usuario")</code> — prepara uma consulta SQL
+              que busca as quatro colunas da tabela <code>usuario</code>. "Preparar" significa que o PHP monta a
+              consulta antes de executá-la (isso também é o que protege contra <em>SQL Injection</em> quando a consulta
+              tem parâmetros — aqui não tem, mas é o mesmo mecanismo usado em <code>cadastro.php</code>).</li>
+            <li><code>$stmt->execute();</code> — de fato executa a consulta no banco de dados.</li>
+            <li><code>$stmt->fetchAll(PDO::FETCH_ASSOC)</code> — pega <strong>todos</strong> os resultados de uma vez e
+              guarda em <code>$usuarios</code> como um array de arrays associativos. Ou seja, cada usuário vira algo como
+              <code>['id' => 1, 'usuario' => 'gio', 'nickname' => 'Gi', 'cor' => '#ff0000']</code>.</li>
+            <li>A partir da linha <code>&lt;HTML&gt;</code>, o arquivo passa a gerar a página que o navegador vai exibir.
+              Repare que o <code>&lt;?php ... ?&gt;</code> "corta e volta" para o HTML puro sempre que for necessário.</li>
+            <li><code>&lt;A HREF="cadastro.php" CLASS="btn-novo"&gt;Novo +&lt;/A&gt;</code> — é o link/botão que leva o
+              usuário até a tela de cadastro. É a ligação entre as duas telas.</li>
+            <li><code>foreach ($usuarios as $usuario) { ... }</code> — este é o coração da listagem: um laço que percorre
+              cada usuário encontrado no banco e, para cada um, imprime (<code>echo</code>) uma linha <code>&lt;TR&gt;</code>
+              da tabela com os dados daquele usuário.</li>
+            <li>Dentro do laço, cada <code>echo</code> concatena texto HTML com os valores vindos do banco
+              (<code>$usuario['id']</code>, <code>$usuario['usuario']</code> etc.) usando o operador <code>.</code>
+              (ponto), que em PHP serve para "colar" strings.</li>
+            <li>A célula da cor é a mais interessante: ela cria uma <code>&lt;span&gt;</code> circular
+              (<code>class="color-badge"</code>, estilizada no CSS) cujo <code>background-color</code> é definido
+              dinamicamente com o valor salvo no banco — por isso a "bolinha" aparece pintada com a cor exata que o
+              usuário escolheu no cadastro.</li>
+          </ol>
+        </div>
+      </div>
+    </section>
 
-&lt;?php
-$conn-&gt;close();
-?&gt;</code></pre>
+    <!-- ===================== cadastro.php ===================== -->
+    <section id="cadastro">
+      <div class="card accent-violet">
+        <h2>5) <code>cadastro.php</code> — formulário e inserção</h2>
+        <span class="filetab">cadastro.php</span>
+        <pre><code>&lt;?php
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    require_once "conn.php";
 
-      <p>
-        Este é o padrão básico: <strong>PHP consulta</strong> e <strong>HTML exibe</strong>.
-        O <strong>while</strong> percorre cada linha retornada pelo banco e cria uma linha na tabela.
-      </p>
-    </div>
+    $sql = "INSERT INTO usuario (usuario, nickname, cor)
+            VALUES (:usuario, :nickname, :cor)";
 
-    <div class="card">
-      <h2>4) Como explicar isso para alunos</h2>
-      <p>
-        A melhor forma de ensinar é mostrar a separação de responsabilidades:
-      </p>
-      <ul>
-        <li><strong>Banco de dados</strong>: guarda os dados.</li>
-        <li><strong>PHP</strong>: conversa com o banco e traz os dados.</li>
-        <li><strong>HTML</strong>: estrutura a tela.</li>
-        <li><strong>PHP + HTML</strong>: mistura os dados dentro da página.</li>
-      </ul>
-      <p>
-        Se o aluno não entender, peça que ele responda: “Qual é a etapa 1? Conectar. Etapa 2? Consultar.
-        Etapa 3? Mostrar.” Isso ajuda a quebrar a lógica em passos simples.
-      </p>
-    </div>
+    $stmt = $pdo-&gt;prepare($sql);
+    $stmt-&gt;execute($_POST);
 
-    <div class="card">
-      <h2>5) Tela de cadastro</h2>
-      <p>
-        Agora, para cadastrar, normalmente existem duas telas (ou duas partes da mesma tela):
-      </p>
-      <ol>
-        <li>Uma página com o formulário.</li>
-        <li>Uma página que recebe os dados enviados e insere no banco.</li>
-      </ol>
+    header("Location: ./index.php");
+}
+?&gt;
+&lt;HTML&gt;
+    &lt;HEAD&gt;
+        &lt;META CHARSET="UTF-8"/&gt;
+        &lt;LINK HREF="style.css" REL="STYLESHEET"/&gt;
+        &lt;TITLE&gt;Candy Crush&lt;/TITLE&gt;
+    &lt;/HEAD&gt;
+    &lt;BODY&gt;
+        &lt;H1&gt;Cadastro de usuários&lt;/H1&gt;
+        &lt;FORM ACTION="cadastro.php" METHOD="POST"&gt;
+            &lt;INPUT TYPE="TEXT" NAME="usuario" PLACEHOLDER="User" REQUIRED/&gt;&lt;BR/&gt;
+            &lt;INPUT TYPE="TEXT" NAME="nickname" PLACEHOLDER="Nick" REQUIRED/&gt;&lt;BR/&gt;
+            &lt;INPUT TYPE="COLOR" NAME="cor" PLACEHOLDER="Cor"/&gt;&lt;BR/&gt;
+            &lt;BUTTON TYPE="SUBMIT"&gt;Enviar&lt;/BUTTON&gt;
+        &lt;/FORM&gt;
+    &lt;/BODY&gt;
+&lt;/HTML&gt;</code></pre>
 
-      <h3>Formulário HTML</h3>
-      <pre><code>&lt;form action="salvar_cliente.php" method="POST"&gt;
-    &lt;label&gt;
-        Nome:
-        &lt;input type="text" name="nome" required&gt;
-    &lt;/label&gt;
+        <div class="explica">
+          <p><strong>Esse arquivo faz duas coisas diferentes, dependendo de como foi acessado:</strong></p>
+          <ol class="steps">
+            <li><strong>Quando alguém apenas abre a página</strong> (clicando em "Novo +" no <code>index.php</code>),
+              o navegador faz uma requisição <code>GET</code>. Nesse caso, <code>$_SERVER['REQUEST_METHOD']</code> é
+              <code>"GET"</code>, então o <code>if</code> não entra, e o PHP simplesmente mostra o formulário HTML.</li>
+            <li><strong>Quando o formulário é enviado</strong> (botão "Enviar" clicado), o navegador faz uma requisição
+              <code>POST</code> para o próprio <code>cadastro.php</code> (veja <code>ACTION="cadastro.php"</code> no
+              <code>&lt;FORM&gt;</code>). Agora <code>$_SERVER['REQUEST_METHOD'] === 'POST'</code> é verdadeiro, e o
+              bloco dentro do <code>if</code> é executado <em>antes</em> de qualquer HTML ser mostrado.</li>
+          </ol>
+          <p><strong>Dentro do <code>if</code>, o que acontece:</strong></p>
+          <ul class="check">
+            <li><code>require_once "conn.php";</code> — conecta ao banco (só precisa disso quando for realmente gravar algo).</li>
+            <li><code>$sql = "INSERT INTO usuario (...) VALUES (:usuario, :nickname, :cor)"</code> — monta o comando SQL de
+              inserção. Os <code>:usuario</code>, <code>:nickname</code> e <code>:cor</code> são <strong>parâmetros
+              nomeados</strong>: espaços reservados que serão preenchidos depois, em vez de colar o texto direto na
+              consulta. Isso é o que se chama de <em>prepared statement</em> (consulta preparada).</li>
+            <li><code>$stmt = $pdo->prepare($sql);</code> — prepara essa consulta no banco.</li>
+            <li><code>$stmt->execute($_POST);</code> — aqui está o "pulo do gato": o array <code>$_POST</code> (que contém
+              tudo o que veio do formulário, como <code>['usuario' => 'gio', 'nickname' => 'Gi', 'cor' => '#ff0000']</code>)
+              é passado direto para o <code>execute()</code>. O PDO casa automaticamente as chaves do array
+              (<code>usuario</code>, <code>nickname</code>, <code>cor</code>) com os parâmetros nomeados
+              (<code>:usuario</code>, <code>:nickname</code>, <code>:cor</code>) da consulta, e insere os valores com
+              segurança — isso evita <em>SQL Injection</em>, porque o PDO trata os valores como dados, nunca como
+              comandos SQL.</li>
+            <li><code>header("Location: ./index.php");</code> — depois de inserir, redireciona o navegador de volta para
+              a listagem. É por isso que, ao cadastrar um novo usuário, você "volta" automaticamente para a tabela e já
+              vê o novo registro lá.</li>
+          </ul>
+          <p><strong>No formulário HTML:</strong></p>
+          <ul class="check">
+            <li><code>NAME="usuario"</code>, <code>NAME="nickname"</code>, <code>NAME="cor"</code> — o atributo
+              <code>NAME</code> de cada <code>&lt;INPUT&gt;</code> é a chave que vai aparecer dentro de <code>$_POST</code>.
+              Se o <code>NAME</code> não bater com o parâmetro nomeado da consulta (<code>:usuario</code> etc.), o
+              cadastro não funciona.</li>
+            <li><code>REQUIRED</code> — validação simples feita pelo próprio navegador: impede o envio se o campo
+              estiver vazio (mas não substitui validação no servidor em um projeto real).</li>
+            <li><code>TYPE="COLOR"</code> — cria um seletor de cor nativo do navegador; o valor enviado é sempre uma
+              cor no formato hexadecimal, como <code>#3498db</code>.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
 
-    &lt;label&gt;
-        E-mail:
-        &lt;input type="email" name="email" required&gt;
-    &lt;/label&gt;
-
-    &lt;label&gt;
-        Telefone:
-        &lt;input type="text" name="telefone"&gt;
-    &lt;/label&gt;
-
-    &lt;button type="submit"&gt;Salvar&lt;/button&gt;
-&lt;/form&gt;</code></pre>
-
-      <h3>Arquivo salvar_cliente.php</h3>
-      <pre><code>&lt;?php
-$host = 'localhost';
-$user = 'root';
-$password = '';
-$dbname = 'aula_php';
-
-$conn = new mysqli($host, $user, $password, $dbname);
-
-if ($conn-&gt;connect_error) {
-    die('Erro na conexão: ' . $conn-&gt;connect_error);
+    <!-- ===================== style.css ===================== -->
+    <section id="css">
+      <div class="card accent-warning">
+        <h2>6) <code>style.css</code> — o essencial da estilização</h2>
+        <span class="filetab">style.css (trechos)</span>
+        <pre><code>* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
-$nome = $_POST['nome'];
-$email = $_POST['email'];
-$telefone = $_POST['telefone'];
-
-$sql = "INSERT INTO clientes (nome, email, telefone) VALUES ('$nome', '$email', '$telefone')";
-
-if ($conn-&gt;query($sql) === TRUE) {
-    echo 'Cadastro realizado com sucesso!';
-} else {
-    echo 'Erro ao cadastrar: ' . $conn-&gt;error;
+form, table {
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
 }
 
-$conn-&gt;close();
-?&gt;</code></pre>
+.color-badge {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 1px solid #ccc;
+}</code></pre>
+        <div class="explica">
+          <p><strong>Pontos que valem destacar para quem está começando com CSS:</strong></p>
+          <ul class="check">
+            <li><code>* { box-sizing: border-box; margin: 0; padding: 0; }</code> — um "reset" básico: remove as margens
+              e espaçamentos padrão que cada navegador aplica de forma diferente, e faz com que <code>padding</code> e
+              <code>border</code> passem a contar <em>dentro</em> da largura/altura do elemento, o que facilita calcular
+              tamanhos.</li>
+            <li><code>form, table { ... }</code> — os seletores separados por vírgula recebem o mesmo estilo. Aqui, tanto
+              o formulário quanto a tabela viram um "cartão" branco com cantos arredondados e uma sombra suave
+              (<code>box-shadow</code>), dando aquele visual de card que aparece na tela.</li>
+            <li><code>.color-badge</code> — a classe usada na "bolinha" colorida da tabela. <code>border-radius: 50%</code>
+              transforma o quadrado em um círculo perfeito; a cor de fundo em si <strong>não</strong> vem do CSS — ela é
+              definida linha a linha pelo PHP, direto no atributo <code>style</code> de cada <code>&lt;span&gt;</code>
+              (volte na explicação do <code>index.php</code> para relembrar).</li>
+            <li>O restante do arquivo segue o mesmo princípio: classes reutilizáveis (<code>.btn-novo</code> para o botão
+              verde, seletores como <code>tr:hover</code> para destacar a linha ao passar o mouse, <code>th</code> para
+              o cabeçalho azul da tabela) — nada além do que já foi visto em aulas anteriores de CSS.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
 
-      <p>
-        A lógica aqui é simples: o browser envia os dados do formulário para o PHP via <strong>POST</strong>.
-        O PHP pega os valores com <strong>$_POST</strong> e grava no banco com um <strong>INSERT</strong>.
-      </p>
-    </div>
+    <!-- ===================== FLUXO COMPLETO ===================== -->
+    <section id="fluxo">
+      <div class="card">
+        <h2>7) Fluxo completo da aplicação</h2>
+        <div class="flow">
+          Usuário abre index.php<br>
+          ↓<br>
+          conn.php conecta ao banco<br>
+          ↓<br>
+          SELECT busca os usuários (PDO::fetchAll)<br>
+          ↓<br>
+          foreach monta as linhas da tabela<br>
+          ↓<br>
+          Usuário clica em "Novo +"<br>
+          ↓<br>
+          cadastro.php é aberto via GET → mostra o formulário<br>
+          ↓<br>
+          Usuário preenche e clica em "Enviar"<br>
+          ↓<br>
+          cadastro.php recebe a mesma URL, agora via POST<br>
+          ↓<br>
+          INSERT grava o novo usuário no banco<br>
+          ↓<br>
+          header("Location: ./index.php") redireciona<br>
+          ↓<br>
+          index.php é recarregado e já mostra o novo usuário
+        </div>
+      </div>
+    </section>
 
-    <div class="card">
-      <h2>6) Qual é a lógica para seguir?</h2>
-      <p>Para a maioria dos exercícios simples, siga este mapa mental:</p>
+    <!-- ===================== GLOSSÁRIO ===================== -->
+    <section id="glossario">
+      <div class="card">
+        <h2>8) Glossário rápido</h2>
+        <table>
+          <thead><tr><th>Termo</th><th>O que é</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><code>PDO</code></td>
+              <td>PHP Data Objects — classe do PHP para conectar e conversar com bancos de dados de forma padronizada,
+                independente do banco usado (MySQL, PostgreSQL, SQLite...).</td>
+            </tr>
+            <tr>
+              <td><em>Prepared statement</em> (consulta preparada)</td>
+              <td>Uma consulta SQL montada com espaços reservados (<code>:nome</code> ou <code>?</code>) que são
+                preenchidos depois com valores. Protege contra SQL Injection.</td>
+            </tr>
+            <tr>
+              <td><code>$_POST</code></td>
+              <td>Array superglobal do PHP que contém os dados enviados por um formulário com <code>METHOD="POST"</code>,
+                usando o <code>NAME</code> de cada campo como chave.</td>
+            </tr>
+            <tr>
+              <td><code>$_SERVER['REQUEST_METHOD']</code></td>
+              <td>Informa qual método HTTP foi usado na requisição atual: normalmente <code>"GET"</code> (abrir uma
+                página) ou <code>"POST"</code> (enviar um formulário).</td>
+            </tr>
+            <tr>
+              <td><code>header("Location: ...")</code></td>
+              <td>Instrução que manda o navegador redirecionar para outra página. Precisa ser chamada antes de qualquer
+                HTML ser enviado, por isso fica no topo do arquivo, dentro do <code>if</code>.</td>
+            </tr>
+            <tr>
+              <td><code>require_once</code></td>
+              <td>Inclui o conteúdo de outro arquivo PHP no ponto onde é chamado, garantindo que aquele arquivo não seja
+                incluído mais de uma vez na mesma execução.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
 
-      <ol>
-        <li><strong>Defina a tabela</strong> e os campos que vão aparecer.</li>
-        <li><strong>Crie a página de listagem</strong> com estrutura HTML.</li>
-        <li><strong>Faça a conexão com o banco</strong> em PHP.</li>
-        <li><strong>Escreva a consulta SQL</strong> para buscar os dados.</li>
-        <li><strong>Use um loop</strong> para percorrer os registros.</li>
-        <li><strong>Imprima as linhas da tabela</strong> dentro do HTML.</li>
-        <li><strong>Crie um formulário</strong> para receber os dados.</li>
-        <li><strong>Crie outra página PHP</strong> para tratar o envio.</li>
-        <li><strong>Use INSERT</strong> para gravar os dados.</li>
-        <li><strong>Redirecione ou mostre uma mensagem de sucesso</strong>.</li>
-      </ol>
+    <!-- ===================== DICAS E CUIDADOS ===================== -->
+    <section id="dicas">
+      <div class="card accent-warning">
+        <h2>9) Dicas e cuidados (para ir além deste exemplo)</h2>
+        <ul class="check">
+          <li>Este exemplo usa <code>echo</code> para montar HTML direto com os dados do banco. Em um projeto real, vale
+            usar <code>htmlspecialchars()</code> ao imprimir dados do usuário na tela, para evitar problemas se alguém
+            cadastrar um valor com caracteres especiais de HTML.</li>
+          <li>Os nomes das tags aqui estão em maiúsculo (<code>&lt;HTML&gt;</code>, <code>&lt;BODY&gt;</code>...) — o
+            navegador aceita normalmente, mas o padrão mais usado atualmente é escrever tags HTML em minúsculo.</li>
+          <li>Se a tela de listagem aparecer em branco ou der erro de conexão, confira primeiro o <code>conn.php</code>:
+            nome do banco (<code>$dbname</code>), usuário e senha são as causas mais comuns de erro.</li>
+          <li>Para testar sozinho: crie a tabela <code>usuario</code> no banco <code>modular_pwiii</code> com as colunas
+            <code>id</code> (chave primária, auto incremento), <code>usuario</code>, <code>nickname</code> e
+            <code>cor</code>, depois rode este projeto em um servidor local com PHP e MySQL (por exemplo, XAMPP ou
+            <code>php -S localhost:8000</code> com o MySQL rodando à parte).</li>
+        </ul>
+      </div>
+    </section>
 
-      <p>
-        Em sala, esse passo a passo costuma funcionar melhor do que mostrar “um código pronto”
-        logo de início. Primeiro o aluno precisa entender o fluxo: <strong>formulário → envio → PHP → banco → resposta</strong>.
-      </p>
-    </div>
-
-    <div class="card">
-      <h2>7) Lógica de fluxo completa</h2>
-      <pre><code>Usuário abre a página de listagem
-        ↓
-PHP conecta no banco
-        ↓
-SELECT busca os dados
-        ↓
-PHP gera o HTML com a tabela
-        ↓
-Usuário clica em “Cadastrar”
-        ↓
-Formulário envia dados para salvar.php
-        ↓
-PHP recebe os dados com $_POST
-        ↓
-INSERT salva no banco
-        ↓
-Página mostra mensagem de sucesso ou volta para listagem</code></pre>
-    </div>
-
-    <div class="card">
-      <h2>8) Dica importante para o professor</h2>
-      <p>
-        Se os alunos estão “colando IA” e não entendendo, o melhor é exigir que eles expliquem cada linha.
-        Perguntas simples ajudam:
-      </p>
-      <ul>
-        <li>O que é esse <strong>SELECT</strong>?</li>
-        <li>Para que serve o <strong>while</strong>?</li>
-        <li>Quem envia os dados do formulário?</li>
-        <li>O que é o <strong>$_POST</strong>?</li>
-        <li>O que a função <strong>INSERT</strong> faz?</li>
-      </ul>
-      <p>
-        Quando o aluno consegue responder isso sem olhar o código, ele já entendeu o básico.
-      </p>
-    </div>
+    <footer>Material de apoio — PWIII, Aula 02 (20/08). Use o botão no topo da página para baixar o código-fonte completo.</footer>
   </div>
 </body>
 </html>
