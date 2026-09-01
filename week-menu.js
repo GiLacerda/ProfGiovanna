@@ -19,10 +19,15 @@
         return nums ? parseInt(nums[0], 10) : 0;
       }
     },
-    revisao:{
-      match: /^Revisão/i,
+    // "Revisão" -> "Revisão"
+    // Pasta fixa: sempre entra na lista (além do modo principal da matéria) e sempre por último.
+    revisao: {
+      match: /^Revisão$/i,
       label: function (name) {
-        return "Revisão";
+        return 'Revisão';
+      },
+      sortKey: function (name) {
+        return Infinity; // depois de todas as semanas/aulas
       }
     },
     // "2026-08-06-Aula01" ou "2026-08-06-Aula-01" -> "Aula 01: 06/08"
@@ -55,21 +60,33 @@
         return res.json();
       })
       .then(function (items) {
-        var folders = items
+        // pastas do modo principal da matéria (Semana, Aula, etc.)
+        var primary = items
           .filter(function (item) {
             return item.type === 'dir' && mode.match.test(item.name);
           })
           .map(function (item) { return item.name; })
           .sort(function (a, b) { return mode.sortKey(a) - mode.sortKey(b); });
 
+        // pasta "Revisão": sempre incluída junto com o modo principal (se existir na matéria),
+        // e sempre por último na lista. Evita duplicar quando o modo escolhido já é 'revisao'.
+        var revisao = mode === MODES.revisao ? [] : items
+          .filter(function (item) {
+            return item.type === 'dir' && MODES.revisao.match.test(item.name);
+          })
+          .map(function (item) { return item.name; });
+
+        var folders = primary.concat(revisao);
+
         if (folders.length === 0) return; // mantém os links fixos já existentes no HTML
 
         container.innerHTML = '';
         folders.forEach(function (folder) {
+          var entryMode = MODES.revisao.match.test(folder) ? MODES.revisao : mode;
           var a = document.createElement('a');
           a.className = linkClass;
           a.href = folder + '/index.html';
-          a.textContent = mode.label(folder);
+          a.textContent = entryMode.label(folder);
           container.appendChild(a);
         });
       })
