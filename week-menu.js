@@ -19,6 +19,12 @@
         return nums ? parseInt(nums[0], 10) : 0;
       }
     },
+    revisao:{
+      match: /^Revisão/i,
+      label: function (name) {
+        return "Revisão";
+      }
+    },
     // "2026-08-06-Aula01" ou "2026-08-06-Aula-01" -> "Aula 01: 06/08"
     // (o hífen antes do número é opcional, pra aceitar as duas formas usadas nas pastas)
     date: {
