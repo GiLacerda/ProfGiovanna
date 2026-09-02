@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual de Aula: Documentação do Plano de Testes</title>
+    <style>
+        :root {
+            --primary: #1e293b;
+            --primary-light: #334155;
+            --accent: #2563eb;
+            --accent-hover: #1d4ed8;
+            --bg-color: #f1f5f9;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --success-bg: #ecfdf5;
+            --success-text: #065f46;
+            --danger-bg: #fef2f2;
+            --danger-text: #991b1b;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 30px 40px;
+        }
+
+        header h1 {
+            margin: 0 0 10px 0;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        header p {
+            margin: 0;
+            color: #94a3b8;
+            font-size: 14px;
+        }
+
+        /* Abas de Navegação */
+        .tabs {
+            display: flex;
+            background-color: #f8fafc;
+            border-bottom: 1px solid var(--border);
+            padding: 0 20px;
+            gap: 10px;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 16px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn:hover {
+            color: var(--accent);
+        }
+
+        .tab-btn.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+            background-color: var(--card-bg);
+        }
+
+        /* Conteúdo das Abas */
+        .tab-content {
+            display: none;
+            padding: 40px;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            color: var(--primary);
+            font-size: 20px;
+            margin-top: 0;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        p, li {
+            font-size: 15px;
+            line-height: 1.7;
+            color: #334155;
+            text-align: justify;
+        }
+
+        ul, ol {
+            padding-left: 20px;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        /* Tabelas */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            font-size: 14px;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        th, td {
+            padding: 14px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background-color: #f8fafc;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background-color: #f8fafc;
+        }
+
+        code {
+            background-color: #f1f5f9;
+            color: #0f172a;
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 13px;
+        }
+
+        /* Badges de Status */
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge.success {
+            background-color: var(--success-bg);
+            color: var(--success-text);
+        }
+
+        .badge.danger {
+            background-color: var(--danger-bg);
+            color: var(--danger-text);
+        }
+
+        /* Caixas de Destaque */
+        .highlight-box {
+            background-color: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-left: 4px solid #22c55e;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 6px;
+        }
+
+        .highlight-box p {
+            margin: 0;
+            color: #166534;
+        }
+
+        footer {
+            background-color: #f8fafc;
+            border-top: 1px solid var(--border);
+            padding: 20px 40px;
+            text-align: center;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Manual de Aula: Documentação do Plano de Testes</h1>
+            <p>Guia prático para estruturação sistemática de testes, rastreabilidade e tratamento de falhas.</p>
+        </header>
+
+        <!-- Navegação por Abas -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="openTab(event, 'tab-estrutura')">1. Estrutura do Documento</button>
+            <button class="tab-btn" onclick="openTab(event, 'tab-matriz')">2. Matriz de Casos de Teste</button>
+            <button class="tab-btn" onclick="openTab(event, 'tab-falhas')">3. Tratamento de Falhas e Ajustes</button>
+        </div>
+
+        <!-- Conteúdo da Aba 1 -->
+        <div id="tab-estrutura" class="tab-content active">
+            <h2>Estrutura da Documentação do Plano de Testes</h2>
+            <p>A Documentação do Plano de Testes constitui um artefato técnico formal do projeto de software. Para garantir rigor metodológico, completude e rastreabilidade, ela deve ser organizada nas seguintes seções principais:</p>
+            
+            <ul>
+                <li><strong>1. Introdução:</strong> Identificação do projeto, objetivos do documento, público-alvo, escopo das funcionalidades a serem verificadas e glossário de termos e abreviações.</li>
+                <li><strong>2. Requisitos a serem testados:</strong> Delimitação do conjunto de atributos de qualidade e funcionalidades submetidas à verificação (desempenho, segurança, interface de usuário e regras de negócio).</li>
+                <li><strong>3. Estratégias e ferramentas de teste:</strong> Definição dos níveis e tipos de testes executados (unitários, funcionais), critérios de encerramento da fase de validação e tecnologias de apoio utilizadas (ex: PHPUnit, Postman).</li>
+                <li><strong>4. Equipe e infraestrutura:</strong> Descrição dos recursos humanos envolvidos e do ambiente tecnológico de hardware e software que suporta a execução dos testes.</li>
+                <li><strong>5. Cronograma de atividades:</strong> Cronograma contendo os marcos temporais (milestones), datas de início e término das etapas de validação.</li>
+                <li><strong>6. Execução e Rastreabilidade de Testes:</strong> Registro formal com datas, status de cada caso de teste, documentação detalhada das falhas encontradas e o histórico dos ajustes realizados até a aprovação definitiva.</li>
+                <li><strong>7. Documentação complementar:</strong> Relação de artefatos de referência e a matriz detalhada contendo a planilha de casos de teste.</li>
+            </ul>
+        </div>
+
+        <!-- Conteúdo da Aba 2 -->
+        <div id="tab-matriz" class="tab-content">
+            <h2>Matriz de Casos de Teste</h2>
+            <p>A dimensão operacional da Documentação do Plano de Testes é materializada por meio da matriz de rastreabilidade, que especifica de forma granular os cenários de validação do sistema acompanhados de suas respectivas datas de execução.</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Cenário de Teste</th>
+                        <th>Pré-condição</th>
+                        <th>Passos de Execução</th>
+                        <th>Resultado Esperado</th>
+                        <th>Data</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>CT01</code></td>
+                        <td>Realizar autenticação com credenciais válidas</td>
+                        <td>Usuário previamente cadastrado na base de dados</td>
+                        <td>1. Acessar tela de login.<br>2. Inserir e-mail e senha válidos.<br>3. Acionar o comando de entrada.</td>
+                        <td>Redirecionamento bem-sucedido para o painel principal da aplicação.</td>
+                        <td>10/10/2026</td>
+                        <td><span class="badge success">Aprovado</span></td>
+                    </tr>
+                    <tr>
+                        <td><code>CT02</code></td>
+                        <td>Validar restrição de agendamento em horário ocupado</td>
+                        <td>Horário já reservado por outro docente no sistema</td>
+                        <td>1. Selecionar o laboratório.<br>2. Escolher data/hora ocupada.<br>3. Confirmar solicitação.</td>
+                        <td>Exibição de mensagem bloqueando o conflito de agenda.</td>
+                        <td>11/10/2026</td>
+                        <td><span class="badge danger">Reprovado</span></td>
+                    </tr>
+                    <tr>
+                        <td><code>CT03</code></td>
+                        <td>Verificar validação de campos obrigatórios no cadastro de ativos</td>
+                        <td>Acesso à tela de cadastro de equipamentos</td>
+                        <td>1. Manter o campo de identificação vazio.<br>2. Acionar a gravação do registro.</td>
+                        <td>Exibição de alertas de validação visual nos campos pendentes.</td>
+                        <td>12/10/2026</td>
+                        <td><span class="badge success">Aprovado</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Conteúdo da Aba 3 -->
+        <div id="tab-falhas" class="tab-content">
+            <h2>Tratamento de Falhas, Correções e Evidências</h2>
+            <p>Todo teste que apresentar status diferente de "Aprovado" na primeira execução deve ser rigorosamente documentado em uma seção de histórico de depuração. O relatório técnico de ajustes deve descrever claramente:</p>
+            <ul>
+                <li><strong>A Falha Identificada:</strong> Comportamento incorreto observado, mensagens de erro geradas ou divergências em relação ao resultado esperado.</li>
+                <li><strong>Análise e Ajuste Realizado:</strong> Descrição detalhada da intervenção no código-fonte, correção de regra de negócio, ajuste em query ou modificação de interface que solucionou o problema.</li>
+                <li><strong>Reexecução e Homologação:</strong> Data da nova bateria de testes comprovando que o cenário foi validado com sucesso.</li>
+            </ul>
+
+            <div class="highlight-box">
+                <p><strong>Exemplo Prático de Documentação de Correção (Referente ao CT02):</strong><br><br>
+                <em>Em 11/10/2026, o teste CT02 falhou porque a validação de conflito de horários no back-end não considerava o fuso horário correto do servidor, permitindo sobreposições.</em><br><br>
+                <strong>Ajuste realizado:</strong> Correção da consulta SQL no model de Agendamentos para incluir o tratamento de intervalo de tempo fechado e adição de validação em JavaScript no front-end.<br><br>
+                <strong>Reexecução em 12/10/2026:</strong> O sistema passou a bloquear corretamente as reservas duplicadas, alterando o status para Aprovado.</p>
+            </div>
+        </div>
+
+        <footer>
+            <p>Qualidade e Teste de Software - DS3</p>
+        </footer>
+    </div>
+
+    <script>
+        function openTab(evt, tabName) {
+            // Esconde todo o conteúdo das abas
+            const contents = document.getElementsByClassName("tab-content");
+            for (let i = 0; i < contents.length; i++) {
+                contents[i].classList.remove("active");
+            }
+
+            // Remove a classe 'active' de todos os botões
+            const buttons = document.getElementsByClassName("tab-btn");
+            for (let i = 0; i < buttons.length; i++) {
+                buttons[i].classList.remove("active");
+            }
+
+            // Mostra o conteúdo atual e marca o botão como ativo
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+    </script>
+
+</body>
+</html>
