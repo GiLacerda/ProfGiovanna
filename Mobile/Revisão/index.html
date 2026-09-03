@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Roteiro de Revisão — Avaliação Bimestral de Programação Mobile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1b2430;
+    --muted: #66738a;
+    --faint: #98a4b8;
+    --line: #e3e8f0;
+    --bg: #f3f5f9;
+    --surface: #ffffff;
+
+    --c1: #2f6fed; /* componentes */
+    --c1-soft: #eaf1ff;
+    --c2: #0f9d8c; /* acessibilidade */
+    --c2-soft: #e6f7f4;
+    --c3: #b45309; /* banco de dados */
+    --c3-soft: #fdf1e2;
+    --c4: #7c3aed; /* ux */
+    --c4-soft: #f3edfd;
+    --c5: #db2777; /* prototipagem */
+    --c5-soft: #fdeaf2;
+  }
+
+  * { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Manrope', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 20px 72px;
+  }
+
+  /* ---------- Header ---------- */
+
+  .hero {
+    background: linear-gradient(135deg, #14213d 0%, #1f3a63 55%, #2f6fed 130%);
+    color: #fff;
+    padding: 46px 20px 40px;
+    margin-bottom: -28px;
+  }
+
+  .hero-inner {
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .hero .badge {
+    display: inline-block;
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: #cfe0ff;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.22);
+    border-radius: 999px;
+    padding: 5px 14px;
+    margin-bottom: 18px;
+  }
+
+  .hero .school {
+    font-size: 0.85rem;
+    color: #b9c8e6;
+    margin: 0 0 2px;
+  }
+
+  .hero h1 {
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-weight: 600;
+    font-size: clamp(1.55rem, 3.4vw, 2.15rem);
+    line-height: 1.28;
+    margin: 10px auto 16px;
+    max-width: 640px;
+  }
+
+  .hero .meta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin: 0 0 22px;
+    padding: 0;
+    list-style: none;
+  }
+
+  .hero .meta li {
+    font-size: 0.82rem;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 8px;
+    padding: 6px 12px;
+    color: #e7edfb;
+  }
+
+  /* quick nav inside hero */
+  .hero nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .hero nav a {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #dce7fb;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.16);
+    border-radius: 999px;
+    padding: 6px 13px;
+    text-decoration: none;
+    transition: background 0.15s ease;
+  }
+
+  .hero nav a:hover { background: rgba(255,255,255,0.18); }
+
+  /* ---------- Intro card ---------- */
+
+  .intro {
+    position: relative;
+    z-index: 2;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    box-shadow: 0 18px 40px -22px rgba(20, 33, 61, 0.35);
+    padding: 22px 26px;
+    margin: 0 0 40px;
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+  }
+
+  .intro .icon {
+    flex: none;
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: var(--c1-soft);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .intro .icon svg { width: 18px; height: 18px; stroke: var(--c1); }
+
+  .intro p {
+    margin: 0;
+    color: #364256;
+    font-size: 0.97rem;
+  }
+
+  .intro strong { color: var(--ink); }
+
+  /* ---------- Topic cards ---------- */
+
+  .topics {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .topic {
+    scroll-margin-top: 20px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 26px 28px 24px;
+    box-shadow: 0 10px 28px -22px rgba(20, 33, 61, 0.28);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .topic::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 5px;
+    background: var(--accent);
+  }
+
+  .topic-head {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 4px;
+  }
+
+  .topic-num {
+    flex: none;
+    width: 38px;
+    height: 38px;
+    border-radius: 11px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-weight: 800;
+    font-size: 1.02rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .topic h2 {
+    margin: 0;
+    font-size: 1.18rem;
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  .onde-revisar {
+    margin: 12px 0 16px 52px;
+    font-size: 0.82rem;
+    color: var(--muted);
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .onde-revisar .tag {
+    display: inline-block;
+    font-weight: 700;
+    color: var(--accent);
+    background: var(--accent-soft);
+    border-radius: 6px;
+    padding: 1px 8px;
+    font-size: 0.72rem;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    flex: none;
+  }
+
+  .topic-body { padding-left: 52px; }
+
+  .topic-body p.lead {
+    margin: 0 0 16px;
+    font-size: 0.99rem;
+    color: #384153;
+  }
+
+  .topic-body h3 {
+    margin: 18px 0 10px;
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .topic-body ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+  }
+
+  .topic-body li {
+    position: relative;
+    padding-left: 20px;
+    font-size: 0.95rem;
+    color: #384153;
+  }
+
+  .topic-body li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.55em;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+    opacity: 0.85;
+  }
+
+  .topic-body li strong { color: var(--ink); }
+
+  .callout {
+    margin-top: 16px;
+    background: var(--accent-soft);
+    border-radius: 10px;
+    padding: 13px 16px;
+    font-size: 0.92rem;
+    color: #33414f;
+  }
+
+  .callout strong {
+    color: var(--accent);
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .callout.discuss {
+    background: transparent;
+    border: 1.5px dashed var(--accent);
+  }
+
+  .callout.discuss strong { color: var(--accent); }
+
+  .topic:nth-of-type(1) { --accent: var(--c1); --accent-soft: var(--c1-soft); }
+  .topic:nth-of-type(2) { --accent: var(--c2); --accent-soft: var(--c2-soft); }
+  .topic:nth-of-type(3) { --accent: var(--c3); --accent-soft: var(--c3-soft); }
+  .topic:nth-of-type(4) { --accent: var(--c4); --accent-soft: var(--c4-soft); }
+  .topic:nth-of-type(5) { --accent: var(--c5); --accent-soft: var(--c5-soft); }
+
+  /* ---------- Dicas ---------- */
+
+  .dicas {
+    margin-top: 30px;
+    background: #101827;
+    color: #e7ecf7;
+    border-radius: 16px;
+    padding: 26px 28px;
+  }
+
+  .dicas h2 {
+    margin: 0 0 4px;
+    font-size: 1.08rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .dicas h2 svg { width: 19px; height: 19px; stroke: #ffd166; }
+
+  .dicas p.sub {
+    margin: 0 0 16px;
+    color: #9aa7c2;
+    font-size: 0.86rem;
+  }
+
+  .dicas ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px 20px;
+  }
+
+  .dicas li {
+    position: relative;
+    padding-left: 22px;
+    font-size: 0.92rem;
+    color: #cfd8ea;
+  }
+
+  .dicas li::before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    top: 0;
+    color: #ffd166;
+    font-weight: 700;
+    font-size: 0.85rem;
+  }
+
+  /* ---------- Footer ---------- */
+
+  footer {
+    margin-top: 40px;
+    text-align: center;
+    font-size: 0.78rem;
+    color: var(--faint);
+  }
+
+  /* ---------- Responsive ---------- */
+
+  @media (max-width: 640px) {
+    .hero { padding: 38px 16px 34px; }
+    .intro { flex-direction: column; padding: 18px 18px; }
+    .topic { padding: 22px 18px 20px; }
+    .onde-revisar, .topic-body { padding-left: 0; margin-left: 0; }
+    .topic-head { margin-bottom: 8px; }
+    .dicas ul { grid-template-columns: 1fr; }
+    .dicas { padding: 22px 20px; }
+  }
+
+  /* ---------- Print ---------- */
+
+  @media print {
+    body { background: #fff; }
+    .hero { background: #14213d; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .hero nav { display: none; }
+    .topic, .intro { box-shadow: none; break-inside: avoid; }
+    .dicas { break-inside: avoid; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="hero">
+    <div class="hero-inner">
+      <span class="badge">Roteiro de estudos</span>
+      <p class="school">Secretaria Estadual da Educação · E. E. Profª. Olympia Barth de Oliveira</p>
+      <h1>Roteiro de Revisão — Avaliação Bimestral de Programação Mobile</h1>
+      <ul class="meta">
+        <li>3ª série · Ensino Médio PEI</li>
+        <li>3º Bimestre</li>
+        <li>Profª. Giovanna Eliza Lacerda</li>
+      </ul>
+      <nav>
+        <a href="#t1">1. Componentização</a>
+        <a href="#t2">2. Acessibilidade e usabilidade</a>
+        <a href="#t3">3. Banco de dados</a>
+        <a href="#t4">4. UX</a>
+        <a href="#t5">5. Prototipagem</a>
+      </nav>
+    </div>
+  </div>
+
+  <div class="wrap">
+
+    <div class="intro">
+      <span class="icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+      </span>
+      <p>Para se preparar para a avaliação, revise os temas abaixo, retomando os materiais e as atividades trabalhadas em cada aula. <strong>Este roteiro explica os conceitos para orientar o estudo</strong> — não traz as questões nem as respostas da prova.</p>
+    </div>
+
+    <div class="topics">
+
+      <section class="topic" id="t1">
+        <div class="topic-head">
+          <span class="topic-num">1</span>
+          <h2>Componentização e reutilização de interfaces</h2>
+        </div>
+        <p class="onde-revisar"><span class="tag">Onde revisar</span> Unidade 3 · Componentes avançados de interface — Aula 1: Componentes personalizados</p>
+        <div class="topic-body">
+          <p class="lead">Um componente de interface encapsula um pedaço de lógica e layout, formando um bloco reutilizável — de um botão simples a estruturas mais complexas, como carrosséis e cards. Quanto melhor projetado, mais fácil é usar o mesmo componente em telas diferentes sem reescrever código.</p>
+
+          <h3>Três princípios de um componente reutilizável</h3>
+          <ul>
+            <li><strong>Encapsulamento</strong> — isola a lógica interna, tornando o componente independente do contexto onde é usado.</li>
+            <li><strong>Modularidade</strong> — realiza uma função específica, sem depender excessivamente de coisas externas.</li>
+            <li><strong>Reusabilidade</strong> — permite personalizações (via parâmetros) sem precisar alterar o código-base.</li>
+          </ul>
+
+          <h3>Boas práticas</h3>
+          <ul>
+            <li><strong>Componentização modular</strong> — dividir a interface em partes menores que se combinam. Ex.: um <em>ProductCard</em> pode ser dividido em <em>ProductImage</em>, <em>ProductTitle</em> e <em>ProductPrice</em>.</li>
+            <li><strong>Parâmetros e propriedades</strong> — permitem configurar o comportamento e os dados de cada instância do componente sem mudar seu código (ex.: título, preço, ação do botão).</li>
+            <li><strong>Abstração de estilos com temas</strong> — um tema global de cores e fontes permite adaptar a aparência (ex.: modo claro/escuro) sem alterar a lógica do componente.</li>
+            <li><strong>Composição em vez de herança</strong> — ao montar componentes complexos, compor a partir de subcomponentes reduz o acoplamento e mantém a modularidade.</li>
+          </ul>
+
+          <div class="callout">
+            <strong>Por que isso importa</strong>
+            A reutilização acelera o desenvolvimento e garante que uma atualização no componente central se propague automaticamente para todas as instâncias — mantendo a consistência visual e de comportamento em todo o aplicativo.
+          </div>
+
+          <div class="callout discuss">
+            <strong>Para discutir em sala</strong>
+            Que componentes reutilizáveis vocês reconhecem em aplicativos que usam no dia a dia (cards, barras de navegação, botões de ação)?
+          </div>
+        </div>
+      </section>
+
+      <section class="topic" id="t2">
+        <div class="topic-head">
+          <span class="topic-num">2</span>
+          <h2>Acessibilidade e usabilidade</h2>
+        </div>
+        <p class="onde-revisar"><span class="tag">Onde revisar</span> Unidade 3 · Acessibilidade e usabilidade — Aulas 1 e 2: Princípios de acessibilidade / Testes de usabilidade</p>
+        <div class="topic-body">
+          <p class="lead">Os dois conceitos andam juntos, mas têm focos diferentes: <strong>acessibilidade</strong> garante que o aplicativo possa ser usado por pessoas com diferentes tipos de deficiência (visual, auditiva, motora, cognitiva); <strong>usabilidade</strong> garante que a experiência seja intuitiva, eficiente e agradável para qualquer usuário.</p>
+
+          <h3>Planejamento de testes, passo a passo</h3>
+          <ul>
+            <li><strong>1. Definição de objetivos</strong> — conformidade com as diretrizes WCAG (<em>Web Content Accessibility Guidelines</em>) para acessibilidade; navegação intuitiva e eficiente para usabilidade.</li>
+            <li><strong>2. Identificação do público-alvo</strong> — considerar usuários com diferentes deficiências, faixas etárias e níveis de familiaridade com tecnologia.</li>
+            <li><strong>3. Seleção de ferramentas</strong> — leitores de tela como VoiceOver (iOS) e TalkBack (Android) para acessibilidade; softwares como Hotjar e UserTesting para usabilidade.</li>
+            <li><strong>4. Definição de métricas</strong> — taxa de conformidade com o WCAG e número de erros identificados por ferramentas automatizadas (acessibilidade); tempo para completar tarefas, número de cliques, taxa de erro e satisfação do usuário (usabilidade).</li>
+          </ul>
+
+          <h3>Na execução</h3>
+          <ul>
+            <li>Testes de acessibilidade verificam descrições para leitores de tela (atributo <em>alt</em>), navegação por teclado e contraste de cores.</li>
+            <li>Testes de usabilidade envolvem observar usuários reais navegando e usar mapas de calor (<em>heatmaps</em>) para ver onde eles clicam e onde encontram dificuldades.</li>
+            <li>Na análise, os problemas são classificados por severidade (crítico, médio, baixo) e reunidos num relatório com soluções recomendadas e impacto estimado.</li>
+          </ul>
+
+          <div class="callout discuss">
+            <strong>Para discutir em sala</strong>
+            Se a equipe tivesse só 24 horas antes do lançamento para ajustar acessibilidade, o que vocês priorizariam primeiro — e por quê?
+          </div>
+        </div>
+      </section>
+
+      <section class="topic" id="t3">
+        <div class="topic-head">
+          <span class="topic-num">3</span>
+          <h2>Banco de dados relacional x NoSQL</h2>
+        </div>
+        <p class="onde-revisar"><span class="tag">Onde revisar</span> Unidade 2 · Banco de dados avançados — Aula 1: Banco de dados relacional vs. NoSQL</p>
+        <div class="topic-body">
+          <p class="lead">A escolha do tipo de banco de dados impacta diretamente o desempenho e a escalabilidade de um aplicativo — não existe um "melhor" banco, e sim o mais adequado para cada cenário.</p>
+
+          <ul>
+            <li><strong>Bancos relacionais</strong> — organizam os dados em tabelas com relações bem definidas entre elas, priorizando consistência e integridade. São a escolha natural quando os dados têm uma estrutura fixa e as relações entre eles importam (ex.: cadastros, transações).</li>
+            <li><strong>Bancos NoSQL</strong> — pensados para lidar com grandes volumes de dados heterogêneos, priorizando escalabilidade e flexibilidade. Facilitam o processamento de dados que mudam de formato ou crescem rapidamente (ex.: feeds, mensagens, catálogos variáveis).</li>
+          </ul>
+
+          <div class="callout">
+            <strong>Como pensar na escolha</strong>
+            Pergunte: os dados têm uma estrutura fixa e relações importantes entre si, com necessidade forte de consistência? Tende a pedir um banco relacional. O volume de dados é grande, variável, e a prioridade é escalar rápido? Tende a pedir um NoSQL.
+          </div>
+
+          <div class="callout discuss">
+            <strong>Para discutir em sala</strong>
+            Peça exemplos de apps do celular dos alunos e discutam juntos: esse app provavelmente usa um banco relacional ou NoSQL — e por quê?
+          </div>
+        </div>
+      </section>
+
+      <section class="topic" id="t4">
+        <div class="topic-head">
+          <span class="topic-num">4</span>
+          <h2>Fundamentos de UX (experiência do usuário)</h2>
+        </div>
+        <p class="onde-revisar"><span class="tag">Onde revisar</span> Unidade 3 · Design e experiência do usuário (UX) — Aula 1: Fundamentos de UX</p>
+        <div class="topic-body">
+          <p class="lead">O design centrado no usuário (<em>User-Centered Design</em> — UCD) é uma abordagem que coloca as necessidades e preferências de quem vai usar o aplicativo no centro de todo o processo de desenvolvimento, prevenindo interfaces confusas e funcionalidades pouco intuitivas.</p>
+
+          <h3>Quatro princípios fundamentais</h3>
+          <ul>
+            <li><strong>Empatia com o usuário</strong> — compreender necessidades, limitações e o contexto emocional de quem usa o app (ex.: criar personas, como um idoso que precisa de botões maiores).</li>
+            <li><strong>Participação ativa dos usuários</strong> — envolver o público desde a concepção até os testes finais, não só no final.</li>
+            <li><strong>Interação contínua</strong> — melhorar com base em testes e feedback constantes, em vez de tratar o design como algo "pronto" de uma vez.</li>
+            <li><strong>Acessibilidade universal</strong> — seguir diretrizes como o WCAG para garantir que qualquer pessoa consiga usar o produto.</li>
+          </ul>
+
+          <h3>Métodos de pesquisa com usuários</h3>
+          <ul>
+            <li><strong>Entrevistas</strong> — exploram motivações, dificuldades e expectativas.</li>
+            <li><strong>Testes de usabilidade</strong> — observam o usuário interagindo com o app para identificar problemas.</li>
+            <li><strong>Mapas de calor</strong> — mostram as áreas mais acessadas da tela.</li>
+            <li><strong>Questionários</strong> — coletam feedback quantitativo sobre satisfação.</li>
+            <li><strong>Análise de concorrência</strong> — compara aplicativos parecidos para identificar boas práticas.</li>
+          </ul>
+
+          <div class="callout discuss">
+            <strong>Para discutir em sala</strong>
+            No caso fictício de um app de saúde usado principalmente por idosos, que decisões de UX vocês tomariam para deixá-lo mais acessível e intuitivo?
+          </div>
+        </div>
+      </section>
+
+      <section class="topic" id="t5">
+        <div class="topic-head">
+          <span class="topic-num">5</span>
+          <h2>Prototipagem e wireframes</h2>
+        </div>
+        <p class="onde-revisar"><span class="tag">Onde revisar</span> Unidade 3 · Design e experiência do usuário (UX) — Aula 2: Prototipagem e wireframes</p>
+        <div class="topic-body">
+          <p class="lead">Antes de programar uma tela, faz sentido primeiro estruturá-la e testar seu fluxo de navegação — é para isso que servem wireframes e protótipos.</p>
+
+          <ul>
+            <li><strong>Wireframe</strong> — organiza os elementos da interface de forma funcional, sem se preocupar com o visual final (cores, fontes, imagens). O foco é a estrutura e a disposição dos elementos na tela.</li>
+            <li><strong>Protótipo</strong> — vai além do wireframe ao simular a interação do usuário com a interface, podendo ser navegável entre telas para representar o fluxo real de uso.</li>
+          </ul>
+
+          <div class="callout">
+            <strong>A diferença central</strong>
+            O wireframe é estrutural e estático; o protótipo simula a interação e a navegação real entre as telas. Ferramentas como Figma e Adobe XD permitem criar os dois — mas não eliminam a necessidade de testar a interface, nem geram o código final automaticamente.
+          </div>
+
+          <div class="callout discuss">
+            <strong>Para discutir em sala</strong>
+            Por que vale a pena prototipar antes de programar, mesmo quando o prazo do projeto está apertado?
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <div class="dicas">
+      <h2>
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.1V17a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-.2c0-.8.4-1.6 1-2.1A7 7 0 0 0 12 2Z"/></svg>
+        Dicas para estudar
+      </h2>
+      <p class="sub">Pequenos hábitos que ajudam a fixar o conteúdo antes da prova.</p>
+      <ul>
+        <li>Releia os slides/apostilas das aulas indicadas em cada tema</li>
+        <li>Revise os quadros "Construindo o conceito" de cada aula</li>
+        <li>Assista novamente aos vídeos complementares sugeridos no material</li>
+        <li>Refaça as atividades "Colocando em prática"</li>
+        <li>Releia os resumos "O que nós aprendemos hoje"</li>
+        <li>Anote as dúvidas que restarem para esclarecer antes da prova</li>
+      </ul>
+    </div>
+
+    <footer>
+      Roteiro de estudos.
+    </footer>
+
+  </div>
+
+</body>
+</html>

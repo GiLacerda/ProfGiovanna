@@ -21,8 +21,12 @@
     },
     // "Revisão" -> "Revisão"
     // Pasta fixa: sempre entra na lista (além do modo principal da matéria) e sempre por último.
+    // Obs.: o match usa "Revis.o" (um caractere qualquer no lugar do "ã") em vez de "Revisão"
+    // porque algumas pastas foram criadas/zipadas fora do GitHub com uma codificação diferente
+    // de UTF-8, o que troca o "ã" por um caractere corrompido no nome salvo no repositório.
+    // Com "." no lugar do "ã" o menu encontra a pasta de qualquer forma, mesmo com esse nome torto.
     revisao: {
-      match: /^Revisão$/i,
+      match: /^Revis.o$/i,
       label: function (name) {
         return 'Revisão';
       },
