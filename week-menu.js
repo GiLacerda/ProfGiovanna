@@ -2,6 +2,10 @@
   var OWNER = 'GiLacerda';
   var REPO = 'ProfGiovanna';
 
+  // Ordem em que as pastas "fixas" (que entram sempre, além do modo principal
+  // da matéria) aparecem no menu: primeiro Pesquisa, depois Revisão.
+  var AUX_ORDER = ['pesquisa', 'revisao'];
+
   var MODES = {
     // "Semana18" -> "Semana 18" | "Semana15-16-17" -> "Semanas 15, 16 e 17"
     semana: {
@@ -19,6 +23,25 @@
         return nums ? parseInt(nums[0], 10) : 0;
       }
     },
+    // "Pesquisa" -> "Pesquisa" | "Pesquisa-FrontEnd" -> "Pesquisa: Front End"
+    // Pasta fixa: sempre entra na lista (além do modo principal da matéria) e sempre
+    // depois das semanas/aulas, mas antes da Revisão. Aceita "Pesquisa" sozinha ou com
+    // um sufixo separado por hífen, underscore, espaço ou CamelCase.
+    pesquisa: {
+      match: /^Pesquisa/i,
+      label: function (name) {
+        var rest = name.replace(/^Pesquisa[-_\s]*/i, '');
+        if (!rest) return 'Pesquisa';
+        var words = rest
+          .replace(/([a-z])([A-Z])/g, '$1 $2')
+          .replace(/[-_]+/g, ' ')
+          .trim();
+        return 'Pesquisa: ' + words;
+      },
+      sortKey: function (name) {
+        return 1e9; // depois das semanas/aulas, antes da Revisão (Infinity)
+      }
+    },
     // "Revisão" -> "Revisão"
     // Pasta fixa: sempre entra na lista (além do modo principal da matéria) e sempre por último.
     // Obs.: o match usa "Revis.o" (um caractere qualquer no lugar do "ã") em vez de "Revisão"
@@ -31,7 +54,7 @@
         return 'Revisão';
       },
       sortKey: function (name) {
-        return Infinity; // depois de todas as semanas/aulas
+        return Infinity; // depois de todas as semanas/aulas/pesquisas
       }
     },
     // "2026-08-06-Aula01" ou "2026-08-06-Aula-01" -> "Aula 01: 06/08"
@@ -53,7 +76,8 @@
 
   window.renderWeekMenu = function (subject, containerSelector, options) {
     options = options || {};
-    var mode = MODES[options.mode || 'semana'];
+    var modeKey = options.mode || 'semana';
+    var mode = MODES[modeKey];
     var linkClass = options.linkClass || 'week';
     var container = document.querySelector(containerSelector);
     if (!container || !mode) return;
@@ -72,21 +96,36 @@
           .map(function (item) { return item.name; })
           .sort(function (a, b) { return mode.sortKey(a) - mode.sortKey(b); });
 
-        // pasta "Revisão": sempre incluída junto com o modo principal (se existir na matéria),
-        // e sempre por último na lista. Evita duplicar quando o modo escolhido já é 'revisao'.
-        var revisao = mode === MODES.revisao ? [] : items
-          .filter(function (item) {
-            return item.type === 'dir' && MODES.revisao.match.test(item.name);
-          })
-          .map(function (item) { return item.name; });
+        // pastas fixas (Pesquisa, Revisão): sempre incluídas junto com o modo principal
+        // (se existirem na matéria), na ordem definida por AUX_ORDER, e sempre depois
+        // do modo principal. Evita duplicar quando o modo escolhido já é uma delas.
+        var extras = [];
+        AUX_ORDER.forEach(function (auxKey) {
+          if (auxKey === modeKey) return;
+          var auxMode = MODES[auxKey];
+          var found = items
+            .filter(function (item) {
+              return item.type === 'dir' && auxMode.match.test(item.name);
+            })
+            .map(function (item) { return item.name; })
+            .sort(function (a, b) { return auxMode.sortKey(a) - auxMode.sortKey(b); });
+          extras = extras.concat(found);
+        });
 
-        var folders = primary.concat(revisao);
+        var folders = primary.concat(extras);
 
         if (folders.length === 0) return; // mantém os links fixos já existentes no HTML
 
         container.innerHTML = '';
         folders.forEach(function (folder) {
-          var entryMode = MODES.revisao.match.test(folder) ? MODES.revisao : mode;
+          var entryMode = mode;
+          for (var i = 0; i < AUX_ORDER.length; i++) {
+            var auxKey = AUX_ORDER[i];
+            if (auxKey !== modeKey && MODES[auxKey].match.test(folder)) {
+              entryMode = MODES[auxKey];
+              break;
+            }
+          }
           var a = document.createElement('a');
           a.className = linkClass;
           a.href = folder + '/index.html';
