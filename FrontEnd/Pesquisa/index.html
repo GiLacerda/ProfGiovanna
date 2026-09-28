@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pesquisa de Aprofundamento — Programação Front-End</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --text: #1b2333;
+    --text-soft: #4a5568;
+    --line: #d7dce6;
+    --accent: #1b2a4a;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1e1e2e;
+      --text: #cdd6f4;
+      --text-soft: #a6adc8;
+      --line: #3a3d52;
+      --accent: #89b4fa;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.55;
+    padding: env(safe-area-inset-top,0) env(safe-area-inset-right,0) env(safe-area-inset-bottom,0) env(safe-area-inset-left,0);
+  }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 24px 18px 60px; }
+
+  table.header { width: 100%; border-collapse: collapse; margin-bottom: 26px; font-size: 0.92rem; }
+  table.header td { border: 1px solid var(--line); padding: 8px 12px; vertical-align: top; }
+  table.header td.label { color: var(--text-soft); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.03em; display: block; margin-bottom: 2px; }
+
+  h1 { font-size: 1.3rem; color: var(--accent); margin: 0 0 4px; }
+  .school { color: var(--text-soft); margin: 0 0 18px; }
+  h2 { font-size: 1.1rem; color: var(--accent); border-bottom: 1px solid var(--line); padding-bottom: 6px; margin: 30px 0 12px; }
+  h3 { font-size: 1rem; margin: 18px 0 6px; }
+  p { margin: 0 0 10px; }
+  ul, ol { margin: 0 0 14px; padding-left: 22px; }
+  li { margin-bottom: 6px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Pesquisa de Aprofundamento — Programação Front-End</h1>
+  <p class="school">E. E. Profª. Olympia Barth de Oliveira</p>
+
+  <h2>Parte 1 — Pesquisa Teórica</h2>
+  <p>Responda, com suas próprias palavras e pelo menos um exemplo real (trecho de código ou site) para cada item, aos quatro blocos abaixo. Extensão sugerida: entre meia página e uma página por bloco.</p>
+
+  <h3>1. Flexbox</h3>
+  <ul>
+    <li>Explique a diferença entre o eixo principal e o eixo transversal no Flexbox, citando as propriedades que controlam cada um (ex.: justify-content, align-items).</li>
+    <li>Indique um caso de uso em que o Flexbox é a escolha mais indicada de layout.</li>
+  </ul>
+
+  <h3>2. CSS Grid</h3>
+  <ul>
+    <li>Explique a diferença entre um layout construído com Flexbox e um construído com CSS Grid, e em que tipo de estrutura (ex.: grade de cards, layout de página inteira) o Grid costuma ser mais indicado.</li>
+    <li>Pesquise as propriedades grid-template-columns, grid-template-rows e gap e explique o papel de cada uma.</li>
+  </ul>
+
+  <h3>3. Performance web</h3>
+  <ul>
+    <li>Explique o que é Lazy Loading, como ativá-lo em imagens (atributo loading) e em que situações ele traz mais benefício.</li>
+    <li>Explique o que é minificação de CSS/JavaScript e pesquise mais uma técnica de performance (ex.: compressão de imagens, cache do navegador, uso de CDN).</li>
+  </ul>
+
+  <h3>4. Acessibilidade</h3>
+  <ul>
+    <li>Explique o papel do atributo alt e pesquise pelo menos dois atributos ARIA, explicando para que servem.</li>
+    <li>Pesquise a ferramenta WAVE (ou outra, como o Lighthouse) e explique como ela ajuda a identificar problemas de acessibilidade em uma página.</li>
+  </ul>
+
+  <h2>Parte 2 — Atividade Prática</h2>
+  <p>Escolha UMA das três opções abaixo:</p>
+  <ol>
+    <li><strong>Auditoria de uma página existente</strong> — Escolha um site do seu dia a dia, rode uma análise com o WAVE (ou Lighthouse) e liste 3 problemas de acessibilidade e/ou performance encontrados, propondo a correção de cada um (ex.: adicionar alt, adicionar loading="lazy", minificar arquivos).</li>
+    <li><strong>Construção de um layout</strong> — Crie uma pequena página (HTML/CSS) usando Flexbox e CSS Grid combinados, aplicando lazy loading em pelo menos uma imagem e ao menos duas boas práticas de acessibilidade (alt descritivo, contraste adequado, navegação por teclado ou uso de ARIA).</li>
+    <li><strong>Flexbox x Grid na prática</strong> — Implemente o mesmo layout (ex.: uma galeria de cards) primeiro com Flexbox e depois com CSS Grid, e escreva uma comparação das vantagens e limitações de cada abordagem para esse caso.</li>
+  </ol>
+
+</div>
+</body>
+</html>
